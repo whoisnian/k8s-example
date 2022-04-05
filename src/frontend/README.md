@@ -10,6 +10,6 @@ frontend served by nginx
 ## start
 ```sh
 cd src/frontend
-sudo nginx -p ./ -c ./nginx/nginx.dev.conf
+nginx -p ./ -c ./nginx/nginx.dev.conf
 # then visit http://127.0.0.1:8082
 ```
