@@ -1,16 +1,16 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
+	"net/url"
 	"sort"
 
 	"github.com/whoisnian/glb/httpd"
 	"github.com/whoisnian/glb/logger"
 )
 
-func selfCreateFileHandler(store *httpd.Store) {
-	store.Respond200([]byte("ok"))
-}
+const fileAddr = "http://127.0.0.1:8081"
 
 type fileInfo struct {
 	Cid  string `json:"cid"`
@@ -39,6 +39,16 @@ var mockMap = map[string]fileInfo{
 	"eeeeeeeeee": {"eeeeeeeeee", "arch.iso", 906309632, 1645149438},
 }
 
+func selfCreateFileHandler(store *httpd.Store) {
+	var info fileInfo
+	err := json.NewDecoder(store.R.Body).Decode(&info)
+	if err != nil {
+		logger.Panic(err)
+	}
+	mockMap[info.Cid] = info
+	store.Respond200([]byte("ok"))
+}
+
 func listFilesHandler(store *httpd.Store) {
 	var files fileInfos
 	for _, v := range mockMap {
@@ -51,6 +61,15 @@ func listFilesHandler(store *httpd.Store) {
 func deleteFileHandler(store *httpd.Store) {
 	cid := store.R.FormValue("cid")
 	delete(mockMap, cid)
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", fileAddr+"/self/file/data?cid="+url.QueryEscape(cid), nil)
+	if err != nil {
+		logger.Panic(err)
+	}
+	_, err = client.Do(req)
+	if err != nil {
+		logger.Panic(err)
+	}
 	store.Respond200([]byte("ok"))
 }
 

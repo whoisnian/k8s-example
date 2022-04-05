@@ -5,7 +5,7 @@ frontend served by nginx
 | method | path      | description      |
 | ------ | --------- | ---------------- |
 | GET    | /static/* | static resources |
-| GET    | /view     | list all files   |
+| GET    | /view/    | list all files   |
 
 ## start
 ```sh

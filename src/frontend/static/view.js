@@ -63,7 +63,7 @@ const calcRelativeTime = (raw) => {
     const tr = createElement('tr')
     // 名称
     const nameTd = createElement('td')
-    const downloadLink = createElement('a', { href: `/file?${new URLSearchParams({ cid })}`, download: name })
+    const downloadLink = createElement('a', { href: `/file/data?${new URLSearchParams({ cid, name })}`, download: name })
     downloadLink.textContent = name
     nameTd.appendChild(downloadLink)
     tr.appendChild(nameTd)
