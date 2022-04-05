@@ -1,0 +1,10 @@
+# Ignore vscode
+.vscode
+*.code-workspace
+
+# Ignore binary
+backend-api
+backend-file
+
+# Ignore dataDir
+backend-file/uploads
