@@ -57,9 +57,9 @@ const calcRelativeTime = (raw) => {
   const infoTable = document.getElementById('infoTable')
   while (infoTable.firstChild) { infoTable.removeChild(infoTable.firstChild) }
 
-  /** @type { { cid: string, name: string, size: number, time: number }[] } */
+  /** @type { { Cid: string, Name: string, Size: number, Time: number }[] } */
   const fileinfos = await (await fetch('/api/files')).json()
-  fileinfos.forEach(({ cid, name, size, time }) => {
+  fileinfos.forEach(({ Cid: cid, Name: name, Size: size, Time: time }) => {
     const tr = createElement('tr')
     // 名称
     const nameTd = createElement('td')

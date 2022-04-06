@@ -1,3 +1,5 @@
+github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
+github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/whoisnian/glb v0.0.6 h1:rBpVVggz6gEm8sNMcz+2L+gvbeNP0YPyjmEvvjYrLx8=
 github.com/whoisnian/glb v0.0.6/go.mod h1:3Ws3TAwvAUs4S4SIkCjm2DJCsvSyqcDQbgI3ANugFJk=
 golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=

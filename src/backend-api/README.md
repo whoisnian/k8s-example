@@ -13,3 +13,15 @@ file meta data
 cd src/backend-api
 go run main.go
 ```
+
+## devDB
+```sh
+docker volume create mysql-data
+docker run --net host -d --name mysql-dev \
+    -e MYSQL_DATABASE=k8s \
+    -e MYSQL_USER=k8s \
+    -e MYSQL_PASSWORD=KxY8cSAWz1WJEfs3 \
+    -e MYSQL_RANDOM_ROOT_PASSWORD=yes \
+    -v mysql-data:/var/lib/mysql \
+    mysql:8
+```
