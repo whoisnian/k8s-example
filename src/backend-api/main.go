@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -20,6 +21,18 @@ var (
 
 	db *sql.DB
 )
+
+func init() {
+	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
+		listenAddr = val
+	}
+	if val, ok := os.LookupEnv("FILE_PREFIX"); ok {
+		filePrefix = val
+	}
+	if val, ok := os.LookupEnv("MYSQL_DSN"); ok {
+		mysqlDSN = val
+	}
+}
 
 type fileInfo struct {
 	Cid  string

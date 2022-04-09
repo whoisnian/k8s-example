@@ -21,6 +21,18 @@ var (
 	rootPath   = "./uploads"
 )
 
+func init() {
+	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
+		listenAddr = val
+	}
+	if val, ok := os.LookupEnv("API_PREFIX"); ok {
+		apiPrefix = val
+	}
+	if val, ok := os.LookupEnv("ROOT_PATH"); ok {
+		rootPath = val
+	}
+}
+
 type fileInfo struct {
 	Cid  string
 	Name string
