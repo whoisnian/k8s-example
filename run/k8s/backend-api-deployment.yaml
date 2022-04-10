@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: k8s-example
+      tier: backend-api
+  template:
+    metadata:
+      labels:
+        app: k8s-example
+        tier: backend-api
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/backend-api:v0.0.2
+          name: backend-api
+          ports:
+            - containerPort: 8080
+          env:
+            - name: FILE_PREFIX
+              value: http://backend-file:8081
+            - name: MYSQL_DSN
+              value: k8s:KxY8cSAWz1WJEfs3@tcp(192.168.122.1:3306)/k8s
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+      restartPolicy: Always

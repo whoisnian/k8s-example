@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: k8s-example
+    tier: backend-file
+  name: backend-file
+spec:
+  ports:
+  - port: 8081
+  selector:
+    app: k8s-example
+    tier: backend-file
