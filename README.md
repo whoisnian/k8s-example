@@ -1,10 +1,10 @@
 # k8s-example
 
 ## test
-[ ] connect to internal service  
+[x] connect to internal service  
 [ ] connect to external service(database)  
 [ ] persistent volume  
-[ ] route requests to services  
+[x] route requests to services  
 [ ] configMap  
 
 ## run
@@ -21,6 +21,4 @@ nginx -p ./ -c ./nginx.test.conf
 cd run/k8s
 kubectl apply -f ./
 # kubectl delete -f ./
-nginx -p ./ -c ./nginx.test.conf
-# then visit http://127.0.0.1:8090
 ```
