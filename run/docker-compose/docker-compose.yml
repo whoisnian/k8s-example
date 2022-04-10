@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      - MYSQL_DATABASE=k8s
+      - MYSQL_USER=k8s
+      - MYSQL_PASSWORD=KxY8cSAWz1WJEfs3
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    volumes:
+      - db-data:/var/lib/mysql
+  frontend:
+    image: reg.whoisnian.com/k8s-example/frontend:v0.0.1
+    restart: always
+    ports:
+      - "8082:8082"
+  backend-file:
+    image: reg.whoisnian.com/k8s-example/backend-file:v0.0.1
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - API_PREFIX=http://backend-api:8080
+    volumes:
+      - uploads:/app/uploads
+  backend-api:
+    image: reg.whoisnian.com/k8s-example/backend-api:v0.0.2
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - FILE_PREFIX=http://backend-file:8081
+      - MYSQL_DSN=k8s:KxY8cSAWz1WJEfs3@tcp(db:3306)/k8s
+
+volumes:
+  db-data: {}
+  uploads: {}

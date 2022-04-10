@@ -109,7 +109,10 @@ func main() {
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 	defer db.Close()
-	db.Exec(createTableSQL)
+	_, err = db.Exec(createTableSQL)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	mux := httpd.NewMux()
 	mux.Handle("/self/api/file", "POST", selfCreateFileHandler)

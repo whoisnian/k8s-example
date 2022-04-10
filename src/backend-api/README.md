@@ -36,7 +36,7 @@ docker run --net host -d --name mysql-dev \
 ## build
 ```sh
 cd src/backend-api
-TAG=v0.0.1
+TAG=v0.0.2
 docker build . -t reg.whoisnian.com/k8s-example/backend-api:$TAG
 docker push reg.whoisnian.com/k8s-example/backend-api:$TAG
 ```
