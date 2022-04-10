@@ -3,4 +3,4 @@
 *.code-workspace
 
 # Ignore dataDir
-backend-file/uploads
+src/backend-file/uploads

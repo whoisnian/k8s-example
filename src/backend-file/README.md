@@ -20,3 +20,11 @@ persistent file storage
 cd src/backend-file
 go run main.go
 ```
+
+## build
+```sh
+cd src/backend-file
+TAG=v0.0.1
+docker build . -t reg.whoisnian.com/k8s-example/backend-file:$TAG
+docker push reg.whoisnian.com/k8s-example/backend-file:$TAG
+```
