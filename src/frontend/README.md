@@ -13,3 +13,11 @@ cd src/frontend
 nginx -p ./ -c ./nginx/nginx.dev.conf
 # then visit http://127.0.0.1:8082
 ```
+
+## build
+```sh
+cd src/frontend
+TAG=v0.0.1
+docker build . -t reg.whoisnian.com/k8s-example/frontend:$TAG
+docker push reg.whoisnian.com/k8s-example/frontend:$TAG
+```
