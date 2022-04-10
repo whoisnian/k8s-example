@@ -6,8 +6,12 @@ metadata:
     tier: backend-file
   name: backend-file
 spec:
+  type: NodePort
   ports:
   - port: 8081
+    targetPort: 8081
+    nodePort: 30081
+    protocol: TCP
   selector:
     app: k8s-example
     tier: backend-file

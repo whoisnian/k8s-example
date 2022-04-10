@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: uploads
+spec:
+  capacity:
+    storage: 512Mi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 192.168.3.201
+    path: "/mnt/870evo/tmp"

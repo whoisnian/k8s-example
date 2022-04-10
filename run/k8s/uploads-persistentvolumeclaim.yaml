@@ -3,8 +3,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: uploads
 spec:
+  volumeName: uploads
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 512Mi

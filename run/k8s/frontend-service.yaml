@@ -9,6 +9,9 @@ spec:
   type: NodePort
   ports:
   - port: 8082
+    targetPort: 8082
+    nodePort: 30082
+    protocol: TCP
   selector:
     app: k8s-example
     tier: frontend
