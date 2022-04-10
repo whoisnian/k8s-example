@@ -32,3 +32,11 @@ docker run --net host -d --name mysql-dev \
     -v mysql-data:/var/lib/mysql \
     mysql:8
 ```
+
+## build
+```sh
+cd src/backend-api
+TAG=v0.0.1
+docker build . -t reg.whoisnian.com/k8s-example/backend-api:$TAG
+docker push reg.whoisnian.com/k8s-example/backend-api:$TAG
+```
