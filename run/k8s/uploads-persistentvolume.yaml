@@ -8,5 +8,5 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.3.201
-    path: "/mnt/870evo/tmp"
+    server: 192.168.122.231
+    path: "/data/uploads"
