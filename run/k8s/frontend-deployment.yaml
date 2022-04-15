@@ -6,21 +6,15 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: k8s-example
-      tier: frontend
+      k8s-example: frontend
   template:
     metadata:
       labels:
-        app: k8s-example
-        tier: frontend
+        k8s-example: frontend
     spec:
       containers:
         - image: reg.whoisnian.com/k8s-example/frontend:v0.0.1
           name: frontend
           ports:
             - containerPort: 8082
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
       restartPolicy: Always
