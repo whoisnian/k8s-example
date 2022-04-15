@@ -2,7 +2,7 @@
 
 ## test
 [x] connect to internal service  
-[ ] connect to external service(database)  
+[x] connect to external service(database)  
 [ ] persistent volume  
 [x] route requests to services  
 [ ] configMap  
