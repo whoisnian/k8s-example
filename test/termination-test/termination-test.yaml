@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: termination-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-example: termination-test
+  template:
+    metadata:
+      labels:
+        k8s-example: termination-test
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/termination-test:0.0.1
+          name: termination-test
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-example: termination-test
+  name: termination-test
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30001
+  selector:
+    k8s-example: termination-test
+  type: NodePort
