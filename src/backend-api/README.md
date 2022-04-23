@@ -2,11 +2,11 @@
 file meta data
 
 ## routes
-| method | path           | description                 |
-| ------ | -------------- | --------------------------- |
-| POST   | /self/api/file | create file entry(internal) |
-| GET    | /api/files     | list all files              |
-| DELETE | /api/file      | delete file                 |
+| method | path           | description                  |
+| ------ | -------------- | ---------------------------- |
+| POST   | /self/api/file | create file entry (internal) |
+| GET    | /api/files     | list all files               |
+| DELETE | /api/file      | delete file                  |
 
 ## config
 | env name    | default value                                |
@@ -36,7 +36,9 @@ docker run --net host -d --name mysql-dev \
 ## build
 ```sh
 cd src/backend-api
-TAG=v0.0.2
+cp ../../go.mod ../../go.sum ./
+TAG=$(cat VERSION)
 docker build . -t reg.whoisnian.com/k8s-example/backend-api:$TAG
 docker push reg.whoisnian.com/k8s-example/backend-api:$TAG
+rm ./go.mod ./go.sum
 ```

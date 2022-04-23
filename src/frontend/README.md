@@ -17,7 +17,7 @@ nginx -p ./ -c ./nginx/nginx.dev.conf
 ## build
 ```sh
 cd src/frontend
-TAG=v0.0.1
+TAG=$(cat VERSION)
 docker build . -t reg.whoisnian.com/k8s-example/frontend:$TAG
 docker push reg.whoisnian.com/k8s-example/frontend:$TAG
 ```

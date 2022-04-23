@@ -106,6 +106,17 @@ func downloadFileHandler(store *httpd.Store) {
 }
 
 func main() {
+	info, err := os.Stat(rootPath)
+	if err == nil && !info.IsDir() {
+		logger.Fatal("root path is not a directory")
+	} else if os.IsNotExist(err) {
+		logger.Info("create root directory")
+		err = os.MkdirAll(rootPath, 0755)
+	}
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	mux := httpd.NewMux()
 	mux.Handle("/self/file/data", "DELETE", selfDeleteFileHandler)
 	mux.Handle("/file/data", "POST", uploadFileHandler)
