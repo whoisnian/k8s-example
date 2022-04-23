@@ -3,19 +3,12 @@ kind: Ingress
 metadata:
   name: ingress-k8s-example
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: 128m
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 8082
           - path: /api/
             pathType: Prefix
             backend:
@@ -30,3 +23,10 @@ spec:
                 name: backend-file
                 port:
                   number: 8081
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 8082

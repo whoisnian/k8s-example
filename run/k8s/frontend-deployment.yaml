@@ -13,7 +13,7 @@ spec:
         k8s-example: frontend
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/frontend:v0.0.1
+        - image: reg.whoisnian.com/k8s-example/frontend:v0.0.2
           name: frontend
           ports:
             - containerPort: 8082

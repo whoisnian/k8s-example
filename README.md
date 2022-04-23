@@ -19,5 +19,5 @@ docker-compose up
 ```sh
 cd run/k8s
 kubectl apply -f ./
-# kubectl delete -f ./
+# then visit http://192.168.122.221:30080
 ```

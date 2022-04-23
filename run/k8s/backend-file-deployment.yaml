@@ -15,7 +15,7 @@ spec:
         k8s-example: backend-file
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/backend-file:v0.0.1
+        - image: reg.whoisnian.com/k8s-example/backend-file:v0.0.2
           name: backend-file
           ports:
             - containerPort: 8081
