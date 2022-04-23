@@ -21,5 +21,9 @@ spec:
             - name: FILE_PREFIX
               value: http://backend-file:8081
             - name: MYSQL_DSN
-              value: k8s:KxY8cSAWz1WJEfs3@tcp(external-database:3306)/k8s
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-dsn
+                  key: dsnStr
+                  optional: false
       restartPolicy: Always
