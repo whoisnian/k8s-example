@@ -5,7 +5,7 @@
 * [x] communication with external service (MySQL)
 * [x] mount persistent volume (NFS)
 * [x] route requests to services (Ingress)
-* [ ] inject configuration data (ConfigMap)
+* [x] inject configuration data (ConfigMap)
 
 ## run
 ### with docker-compose

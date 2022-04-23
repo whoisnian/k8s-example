@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: version-config
+data:
+  VERSION_JSON: '{"backend-api":"v0.0.3","backend-file":"v0.0.2","frontend":"v0.0.2"}'

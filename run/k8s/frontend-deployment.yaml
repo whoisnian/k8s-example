@@ -17,4 +17,14 @@ spec:
           name: frontend
           ports:
             - containerPort: 8082
+          volumeMounts:
+            - name: config
+              mountPath: /app/html/config
       restartPolicy: Always
+      volumes:
+        - name: config
+          configMap:
+            name: version-config
+            items:
+              - key: VERSION_JSON
+                path: version.json
