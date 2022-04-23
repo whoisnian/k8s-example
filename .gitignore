@@ -1,6 +1,5 @@
 # Ignore vscode
 .vscode
-*.code-workspace
 
 # Ignore dataDir
 src/backend-file/uploads

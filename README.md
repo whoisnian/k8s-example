@@ -1,14 +1,14 @@
 # k8s-example
 
-## test
-[x] connect to internal service  
-[x] connect to external service(database)  
-[ ] persistent volume  
-[x] route requests to services  
-[ ] configMap  
+## todo
+* [x] communication between internal services
+* [x] communication with external service (MySQL)
+* [x] mount persistent volume (NFS)
+* [x] route requests to services (Ingress)
+* [ ] inject configuration data (ConfigMap)
 
 ## run
-### docker-compose
+### with docker-compose
 ```sh
 cd run/docker-compose
 docker-compose up
@@ -16,7 +16,7 @@ nginx -p ./ -c ./nginx.test.conf
 # then visit http://127.0.0.1:8090
 ```
 
-### k8s
+### with k8s
 ```sh
 cd run/k8s
 kubectl apply -f ./
