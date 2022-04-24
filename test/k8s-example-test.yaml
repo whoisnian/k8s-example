@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-example-test
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      k8s-example: k8s-example-test
+  template:
+    metadata:
+      labels:
+        k8s-example: k8s-example-test
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.1
+          name: k8s-example-test
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "1536Mi"
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-example: k8s-example-test
+  name: k8s-example-test
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30001
+  selector:
+    k8s-example: k8s-example-test
+  type: NodePort
