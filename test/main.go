@@ -21,7 +21,7 @@ var (
 )
 
 func pingHandler(store *httpd.Store) {
-	logger.Debug("Recerved ping request.")
+	logger.Debug("Received ping request.")
 	store.Respond200([]byte("pong\n"))
 }
 
@@ -30,6 +30,7 @@ func memHandler(store *httpd.Store) {
 	if err != nil {
 		logger.Panic(err)
 	}
+	logger.Debug("Received mem (", cnt, ") request.")
 
 	buf := [][]byte{}
 	for i := 0; i < cnt; i++ {
@@ -39,7 +40,7 @@ func memHandler(store *httpd.Store) {
 	}
 
 	time.Sleep(time.Second * 10)
-	res := strconv.Itoa(len(buf)) + " MiB\n"
+	res := strconv.Itoa(len(buf)*len(buf[0])/1024/1024) + " MiB\n"
 	store.Respond200([]byte(res))
 }
 
