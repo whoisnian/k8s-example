@@ -20,6 +20,12 @@ var (
 	MiB = bytes.Repeat([]byte("0123456789abcdef"), 65536)
 )
 
+func init() {
+	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
+		listenAddr = val
+	}
+}
+
 func pingHandler(store *httpd.Store) {
 	logger.Debug("Received ping request.")
 	store.Respond200([]byte("pong\n"))
