@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-example-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-example: k8s-example-test
+  template:
+    metadata:
+      labels:
+        k8s-example: k8s-example-test
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.4
+          name: k8s-example-test1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MODE_FILE
+              value: "/config/mode8080"
+          volumeMounts:
+            - mountPath: /config/
+              name: config
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.4
+          name: k8s-example-test2
+          ports:
+            - containerPort: 8081
+          env:
+            - name: LISTEN_ADDR
+              value: "0.0.0.0:8081"
+            - name: UPSTREAM
+              value: "http://127.0.0.1:8080/upstream"
+            - name: MODE_FILE
+              value: "/config/mode8081"
+          volumeMounts:
+            - mountPath: /config/
+              name: config
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+      restartPolicy: Always
+      volumes:
+        - name: config
+          emptyDir: { medium: Memory }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-example: k8s-example-test
+  name: k8s-example-test
+spec:
+  ports:
+    - name: test1
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30001
+    - name: test2
+      port: 8081
+      targetPort: 8081
+      protocol: TCP
+      nodePort: 30002
+  selector:
+    k8s-example: k8s-example-test
+  type: NodePort
