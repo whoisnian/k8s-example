@@ -13,7 +13,7 @@ spec:
         k8s-example: k8s-example-test
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.3
+        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.4
           name: k8s-example-test
           ports:
             - containerPort: 8080
