@@ -20,6 +20,7 @@ var (
 	listenAddr = "0.0.0.0:8080"
 	upstream   = ""
 	modeFile   = "./mode"
+	podName    = "unknown"
 
 	// runtime flag
 	modeList   = []string{"normal", "reject", "panic"}
@@ -38,6 +39,9 @@ func init() {
 	}
 	if val, ok := os.LookupEnv("MODE_FILE"); ok {
 		modeFile = val
+	}
+	if val, ok := os.LookupEnv("POD_NAME"); ok {
+		podName = val
 	}
 	if f, err := os.Open(modeFile); err == nil {
 		defer f.Close()
@@ -91,6 +95,11 @@ func upstreamHandler(store *httpd.Store) {
 	}
 }
 
+func podnameHandler(store *httpd.Store) {
+	logger.Debug("Received podname request.")
+	store.Respond200([]byte(podName + "\n"))
+}
+
 func main() {
 	logger.SetDebug(true)
 	if serverMode == "panic" {
@@ -101,6 +110,7 @@ func main() {
 	mux.Handle("/ping", "GET", pingHandler)
 	mux.Handle("/mem", "GET", memHandler)
 	mux.Handle("/upstream", "GET", upstreamHandler)
+	mux.Handle("/podname", "GET", podnameHandler)
 
 	logger.Info("Service started. (", os.Getpid(), ")")
 	if serverMode != "reject" {
@@ -123,6 +133,6 @@ func main() {
 	}()
 
 	<-done
-	time.Sleep(time.Second * 20)
+	time.Sleep(time.Second * 5)
 	logger.Info("Service stopped.")
 }
