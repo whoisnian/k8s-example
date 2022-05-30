@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/backend-api:v0.0.3
+          name: backend-api
+          ports:
+            - containerPort: 8080
+          env:
+            - name: FILE_PREFIX
+              value: http://backend-file:8081
+            - name: MYSQL_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-dsn
+                  key: dsnStr
+                  optional: false

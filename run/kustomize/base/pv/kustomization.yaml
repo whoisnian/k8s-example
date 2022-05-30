@@ -1,0 +1,3 @@
+resources:
+  - ./uploads-persistentvolume.yaml
+  - ./uploads-persistentvolumeclaim.yaml

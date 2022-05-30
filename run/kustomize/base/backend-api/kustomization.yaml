@@ -1,0 +1,9 @@
+commonLabels:
+  k8s-example: backend-api
+resources:
+  - ./backend-api-deployment.yaml
+  - ./backend-api-service.yaml
+secretGenerator:
+  - name: mysql-dsn
+    files:
+      - dsnStr=mysql-dsn.txt

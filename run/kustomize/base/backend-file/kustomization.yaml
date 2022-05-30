@@ -1,0 +1,5 @@
+commonLabels:
+  k8s-example: backend-file
+resources:
+  - ./backend-file-deployment.yaml
+  - ./backend-file-service.yaml

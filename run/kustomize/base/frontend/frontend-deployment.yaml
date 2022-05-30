@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/frontend:v0.0.3
+          name: frontend
+          ports:
+            - containerPort: 8082
+          volumeMounts:
+            - name: config
+              mountPath: /app/html/config
+      volumes:
+        - name: config
+          configMap:
+            name: version-config
+            items:
+              - key: VERSION_JSON
+                path: version.json

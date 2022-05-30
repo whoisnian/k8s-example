@@ -1,0 +1,1 @@
+k8s:KxY8cSAWz1WJEfs3@tcp(external-database:3306)/k8s

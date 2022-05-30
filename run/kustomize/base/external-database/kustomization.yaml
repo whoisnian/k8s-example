@@ -1,0 +1,3 @@
+resources:
+  - ./external-database-endpoints.yaml
+  - ./external-database-service.yaml

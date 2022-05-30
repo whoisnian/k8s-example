@@ -1,0 +1,10 @@
+namespace: k8s-example
+bases:
+  - ../../base/pv
+  - ../../base/ingress
+  - ../../base/external-database
+  - ../../base/frontend
+  - ../../base/backend-file
+  - ../../base/backend-api
+components:
+  - ../../components/version

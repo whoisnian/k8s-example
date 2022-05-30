@@ -1,0 +1,2 @@
+resources:
+  - ./ingress-k8s-example.yaml

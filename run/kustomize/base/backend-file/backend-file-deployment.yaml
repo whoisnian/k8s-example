@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-file
+spec:
+  replicas: 4
+  template:
+    spec:
+      containers:
+        - image: reg.whoisnian.com/k8s-example/backend-file:v0.0.2
+          name: backend-file
+          ports:
+            - containerPort: 8081
+          env:
+            - name: API_PREFIX
+              value: http://backend-api:8080
+          volumeMounts:
+            - mountPath: /app/uploads
+              name: uploads
+      volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: uploads
