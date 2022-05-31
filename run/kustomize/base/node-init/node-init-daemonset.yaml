@@ -17,7 +17,7 @@ spec:
             - mountPath: /public
               name: local-public
         - name: cp-frontend-static
-          image: reg.whoisnian.com/k8s-example/frontend:v1.0.0
+          image: reg.whoisnian.com/k8s-example/frontend:v1.0.1
           command: ["cp", "-r", "/app/html/.", "-t", "/public"]
           volumeMounts:
             - mountPath: /public
