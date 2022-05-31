@@ -6,6 +6,7 @@
 * [x] mount persistent volume (NFS)
 * [x] route requests to services (Ingress)
 * [x] inject configuration data (ConfigMap)
+* [x] organize yaml with kustomization
 
 ## run
 ### with docker-compose
@@ -19,5 +20,13 @@ docker-compose up
 ```sh
 cd run/k8s
 kubectl apply -f ./
+# then visit http://192.168.122.221:30080
+```
+
+### with kustomize
+```sh
+cd run/kustomize
+kubectl apply -f ./k8s-example-namespace.yaml
+kubectl apply -k ./overlays/dev
 # then visit http://192.168.122.221:30080
 ```
