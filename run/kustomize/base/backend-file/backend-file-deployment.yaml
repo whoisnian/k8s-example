@@ -20,4 +20,4 @@ spec:
       volumes:
         - name: uploads
           persistentVolumeClaim:
-            claimName: uploads
+            claimName: uploads-pvc

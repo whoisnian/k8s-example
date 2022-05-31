@@ -7,17 +7,32 @@ spec:
   template:
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/frontend:v0.0.3
+        - image: reg.whoisnian.com/proxy.docker.io/library/nginx:mainline-alpine
+          command:
+            ["/usr/sbin/nginx", "-p", "/app/html/", "-c", "/config/nginx.conf"]
           name: frontend
           ports:
             - containerPort: 8082
           volumeMounts:
-            - name: config
+            - name: nginx-config
+              mountPath: /config
+            - name: version-config
               mountPath: /app/html/config
+            - name: local-public
+              mountPath: /app/html
       volumes:
-        - name: config
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: NGINX_CONF
+                path: nginx.conf
+        - name: version-config
           configMap:
             name: version-config
             items:
               - key: VERSION_JSON
                 path: version.json
+        - name: local-public
+          persistentVolumeClaim:
+            claimName: local-public-pvc

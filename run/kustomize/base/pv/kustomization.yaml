@@ -1,3 +1,5 @@
 resources:
-  - ./uploads-persistentvolume.yaml
-  - ./uploads-persistentvolumeclaim.yaml
+  - ./local-public-pv.yaml
+  - ./local-public-pvc.yaml
+  - ./uploads-pv.yaml
+  - ./uploads-pvc.yaml

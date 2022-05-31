@@ -4,6 +4,9 @@ resources:
   - ./frontend-deployment.yaml
   - ./frontend-service.yaml
 configMapGenerator:
+  - name: nginx-config
+    files:
+      - NGINX_CONF=nginx.prod.conf
   - name: version-config
     files:
       - VERSION_JSON=version.json

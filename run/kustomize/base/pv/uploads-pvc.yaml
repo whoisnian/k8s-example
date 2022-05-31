@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: uploads
+  name: uploads-pvc
 spec:
-  volumeName: uploads
+  volumeName: uploads-pv
   accessModes:
     - ReadWriteMany
   resources:
