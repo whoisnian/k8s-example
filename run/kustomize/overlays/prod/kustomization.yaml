@@ -7,3 +7,5 @@ bases:
   - ../../base/frontend
   - ../../base/backend-file
   - ../../base/backend-api
+components:
+  - ../../components/ingress-body-size
