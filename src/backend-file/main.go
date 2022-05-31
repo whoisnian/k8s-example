@@ -99,8 +99,10 @@ func downloadFileHandler(store *httpd.Store) {
 	}
 	defer file.Close()
 
-	filename := store.R.FormValue("name")
-	store.W.Header().Set("content-disposition", "attachment; filename*=UTF-8''"+filename+"; filename=\""+filename+"\"")
+	if store.R.FormValue("download") == "true" {
+		filename := store.R.FormValue("name")
+		store.W.Header().Set("content-disposition", "attachment; filename*=UTF-8''"+filename+"; filename=\""+filename+"\"")
+	}
 
 	http.ServeFile(store.W, store.R, path)
 }

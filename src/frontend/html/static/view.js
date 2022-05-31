@@ -63,9 +63,9 @@ const calcRelativeTime = (raw) => {
     const tr = createElement('tr')
     // 名称
     const nameTd = createElement('td')
-    const downloadLink = createElement('a', { href: `/file/data?${new URLSearchParams({ cid, name })}`, download: name })
-    downloadLink.textContent = name
-    nameTd.appendChild(downloadLink)
+    const rawLink = createElement('a', { href: `/file/data?${new URLSearchParams({ cid, name })}` })
+    rawLink.textContent = name
+    nameTd.appendChild(rawLink)
     tr.appendChild(nameTd)
     // 大小
     const sizeTd = createElement('td')
@@ -75,6 +75,12 @@ const calcRelativeTime = (raw) => {
     const timeTd = createElement('td')
     timeTd.textContent = calcRelativeTime(time * 1000)
     tr.appendChild(timeTd)
+    // 下载
+    const downTd = createElement('td')
+    const downloadLink = createElement('a', { href: `/file/data?${new URLSearchParams({ cid, name, download: true })}`, download: name })
+    downloadLink.textContent = "下载"
+    downTd.appendChild(downloadLink)
+    tr.appendChild(downTd)
     // 删除
     const delTd = createElement('td')
     const deleteLink = createElement('a')
