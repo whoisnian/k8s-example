@@ -1,0 +1,4 @@
+commonLabels:
+  k8s-example: init-public
+resources:
+  - ./init-public-daemonset.yaml

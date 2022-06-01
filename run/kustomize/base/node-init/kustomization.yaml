@@ -1,4 +1,0 @@
-commonLabels:
-  k8s-example: node-init
-resources:
-  - ./node-init-daemonset.yaml

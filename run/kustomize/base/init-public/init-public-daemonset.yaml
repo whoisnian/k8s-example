@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: init-public
+spec:
+  template:
+    spec:
+      tolerations: # https://kubernetes.io/docs/reference/labels-annotations-taints/#node-role-kubernetes-io-control-plane
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: prepare-dirs
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          command: ["mkdir", "-p", "/public/assets"]
+          volumeMounts:
+            - mountPath: /public
+              name: local-public
+        - name: cp-frontend-static
+          image: reg.whoisnian.com/k8s-example/frontend:TAG_SHOULD_NOT_EXIST
+          command: ["cp", "-r", "/app/html/.", "-t", "/public"]
+          volumeMounts:
+            - mountPath: /public
+              name: local-public
+      containers:
+        - name: noop
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+      volumes:
+        - name: local-public
+          persistentVolumeClaim:
+            claimName: local-public-pvc

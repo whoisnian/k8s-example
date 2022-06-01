@@ -23,7 +23,7 @@ spec:
           volumeMounts:
             - name: nginx-config
               mountPath: /config
-            - name: about-json
+            - name: assets
               mountPath: /app/html/assets
             - name: local-public
               mountPath: /app/html
@@ -34,12 +34,9 @@ spec:
             items:
               - key: NGINX_CONF
                 path: nginx.conf
-        - name: about-json
+        - name: assets
           configMap:
-            name: about-json
-            items:
-              - key: ABOUT_JSON
-                path: about.json
+            name: assets
         - name: local-public
           persistentVolumeClaim:
             claimName: local-public-pvc

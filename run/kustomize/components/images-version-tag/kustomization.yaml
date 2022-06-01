@@ -5,9 +5,9 @@ images:
     newTag: v0.0.3
   - name: reg.whoisnian.com/k8s-example/backend-file # for base/backend-file
     newTag: v0.0.3
-  - name: reg.whoisnian.com/k8s-example/frontend # for base/node-init
+  - name: reg.whoisnian.com/k8s-example/frontend # for base/init-public
     newTag: v1.0.1
   - name: reg.whoisnian.com/proxy.docker.io/library/nginx # for base/frontend
     newTag: mainline-alpine
-  - name: reg.whoisnian.com/proxy.docker.io/library/alpine # for base/node-init
+  - name: reg.whoisnian.com/proxy.docker.io/library/alpine # for base/init-node & base/init-public
     newTag: "3.15"

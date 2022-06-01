@@ -1,9 +1,9 @@
 namespace: k8s-example
 bases:
   - ../../base/pv
-  - ../../base/node-init
+  - ../../base/init-node
+  - ../../base/init-public
   - ../../base/ingress
-  - ../../base/external-database
   - ../../base/frontend
   - ../../base/backend-file
   - ../../base/backend-api

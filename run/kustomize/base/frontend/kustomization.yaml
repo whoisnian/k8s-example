@@ -7,6 +7,7 @@ configMapGenerator:
   - name: nginx-config
     files:
       - NGINX_CONF=nginx.prod.conf
-  - name: about-json
+  - name: assets
     files:
-      - ABOUT_JSON=about.json
+      - ./assets/about.json
+      - ./assets/nyancat.png
