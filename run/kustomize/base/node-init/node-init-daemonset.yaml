@@ -11,20 +11,20 @@ spec:
           effect: NoSchedule
       initContainers:
         - name: prepare-dirs
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
-          command: ["mkdir", "-p", "/public/config"]
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          command: ["mkdir", "-p", "/public/assets"]
           volumeMounts:
             - mountPath: /public
               name: local-public
         - name: cp-frontend-static
-          image: reg.whoisnian.com/k8s-example/frontend:v1.0.1
+          image: reg.whoisnian.com/k8s-example/frontend:TAG_SHOULD_NOT_EXIST
           command: ["cp", "-r", "/app/html/.", "-t", "/public"]
           volumeMounts:
             - mountPath: /public
               name: local-public
       containers:
         - name: node-init
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
           command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
           volumeMounts:
             - mountPath: /public

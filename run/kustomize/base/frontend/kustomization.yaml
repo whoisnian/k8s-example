@@ -7,6 +7,6 @@ configMapGenerator:
   - name: nginx-config
     files:
       - NGINX_CONF=nginx.prod.conf
-  - name: version-config
+  - name: about-json
     files:
-      - VERSION_JSON=version.json
+      - ABOUT_JSON=about.json

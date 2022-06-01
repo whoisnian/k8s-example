@@ -8,4 +8,5 @@ bases:
   - ../../base/backend-file
   - ../../base/backend-api
 components:
+  - ../../components/images-version-tag
   - ../../components/ingress-body-size

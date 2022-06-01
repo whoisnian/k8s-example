@@ -14,7 +14,7 @@ spec:
       #             k8s-example: node-init
       #         topologyKey: kubernetes.io/hostname
       containers:
-        - image: reg.whoisnian.com/proxy.docker.io/library/nginx:mainline-alpine
+        - image: reg.whoisnian.com/proxy.docker.io/library/nginx:TAG_SHOULD_NOT_EXIST
           command:
             ["/usr/sbin/nginx", "-p", "/app/html/", "-c", "/config/nginx.conf"]
           name: frontend
@@ -23,8 +23,8 @@ spec:
           volumeMounts:
             - name: nginx-config
               mountPath: /config
-            - name: version-config
-              mountPath: /app/html/config
+            - name: about-json
+              mountPath: /app/html/assets
             - name: local-public
               mountPath: /app/html
       volumes:
@@ -34,12 +34,12 @@ spec:
             items:
               - key: NGINX_CONF
                 path: nginx.conf
-        - name: version-config
+        - name: about-json
           configMap:
-            name: version-config
+            name: about-json
             items:
-              - key: VERSION_JSON
-                path: version.json
+              - key: ABOUT_JSON
+                path: about.json
         - name: local-public
           persistentVolumeClaim:
             claimName: local-public-pvc

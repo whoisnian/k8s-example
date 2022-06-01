@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/backend-file:v0.0.3
+        - image: reg.whoisnian.com/k8s-example/backend-file:TAG_SHOULD_NOT_EXIST
           name: backend-file
           ports:
             - containerPort: 8081
