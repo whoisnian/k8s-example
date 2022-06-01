@@ -6,13 +6,13 @@ spec:
   replicas: 2
   template:
     spec:
-      affinity: # todo: scheduler test
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  k8s-example: node-init
-              topologyKey: kubernetes.io/hostname
+      # affinity: # may affect feasible nodes scoring? https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/
+      #   podAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #       - labelSelector:
+      #           matchLabels:
+      #             k8s-example: node-init
+      #         topologyKey: kubernetes.io/hostname
       containers:
         - image: reg.whoisnian.com/proxy.docker.io/library/nginx:mainline-alpine
           command:
