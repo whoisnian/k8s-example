@@ -6,13 +6,15 @@ spec:
   replicas: 2
   template:
     spec:
-      # affinity: # may affect feasible nodes scoring? https://kubernetes.io/docs/concepts/scheduling-eviction/kube-scheduler/
-      #   podAffinity:
-      #     requiredDuringSchedulingIgnoredDuringExecution:
-      #       - labelSelector:
-      #           matchLabels:
-      #             k8s-example: node-init
-      #         topologyKey: kubernetes.io/hostname
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: k8s-example
+                    operator: In
+                    values: ["init-public"]
+              topologyKey: kubernetes.io/hostname
       containers:
         - image: reg.whoisnian.com/proxy.docker.io/library/nginx:TAG_SHOULD_NOT_EXIST
           command:

@@ -12,7 +12,7 @@ spec:
       initContainers:
         - name: prepare-dirs
           image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
-          command: ["mkdir", "-p", "/host-mnt/public"]
+          command: ["install", "--mode=0755", "--directory", "/host-mnt/public"] # --owner=500 --group=500
           volumeMounts:
             - mountPath: /host-mnt
               name: host-mnt

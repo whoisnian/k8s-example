@@ -12,10 +12,12 @@ spec:
       initContainers:
         - name: prepare-dirs
           image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
-          command: ["mkdir", "-p", "/public/assets"]
+          command: ["sh", "/scripts/prepare-dirs.sh"]
           volumeMounts:
             - mountPath: /public
               name: local-public
+            - mountPath: /scripts
+              name: scripts
         - name: cp-frontend-static
           image: reg.whoisnian.com/k8s-example/frontend:TAG_SHOULD_NOT_EXIST
           command: ["cp", "-r", "/app/html/.", "-t", "/public"]
@@ -30,3 +32,6 @@ spec:
         - name: local-public
           persistentVolumeClaim:
             claimName: local-public-pvc
+        - name: scripts
+          configMap:
+            name: scripts
