@@ -1,3 +1,4 @@
+# 测试 NodePort 暴露服务
 apiVersion: apps/v1
 kind: Deployment
 metadata:

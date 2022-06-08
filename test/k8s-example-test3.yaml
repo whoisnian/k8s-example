@@ -1,3 +1,4 @@
+# 测试 juicefs-csi-driver 可用性
 apiVersion: v1
 kind: Secret
 metadata:

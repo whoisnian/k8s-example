@@ -1,3 +1,4 @@
+# 测试双 namespace 使用 ingress-nginx.canary 实现灰度上线
 apiVersion: v1
 kind: Namespace
 metadata:

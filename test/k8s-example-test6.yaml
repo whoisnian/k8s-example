@@ -1,3 +1,4 @@
+# 测试 pod 利用 initContainers 强制设定启动顺序
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -64,7 +65,7 @@ spec:
           command:
             [
               "sh",
-              "-c",
+              "-c", # "for i in {1..10}; do echo $i; sleep 0.2; done" in alpine.sh will output "{1..10}"
               "for i in $(seq 1 10); do sleep 3; if wget -O- init-node-svc:8080/ping; then exit 0; fi; done; exit 1",
             ]
         - name: sleep-20

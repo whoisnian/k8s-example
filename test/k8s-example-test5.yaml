@@ -1,3 +1,4 @@
+# 测试 pod 初始化 host 目录及 podAffinity 建立依赖关系
 apiVersion: apps/v1
 kind: Deployment
 metadata:
