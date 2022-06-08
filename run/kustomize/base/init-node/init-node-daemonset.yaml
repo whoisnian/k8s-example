@@ -5,10 +5,6 @@ metadata:
 spec:
   template:
     spec:
-      tolerations: # https://kubernetes.io/docs/reference/labels-annotations-taints/#node-role-kubernetes-io-control-plane
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
       initContainers:
         - name: prepare-dirs
           image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
