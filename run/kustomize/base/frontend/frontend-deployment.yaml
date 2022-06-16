@@ -6,15 +6,15 @@ spec:
   replicas: 2
   template:
     spec:
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: k8s-example
-                    operator: In
-                    values: ["init-public"]
-              topologyKey: kubernetes.io/hostname
+      initContainers:
+        - name: ping
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          command:
+            [
+              "sh",
+              "-c",
+              "for i in $(seq 1 10); do sleep 3; if wget -O- http://init-public:8080/ping; then exit 0; fi; done; exit 1",
+            ]
       containers:
         - image: reg.whoisnian.com/proxy.docker.io/library/nginx:TAG_SHOULD_NOT_EXIST
           command:

@@ -13,9 +13,10 @@ spec:
             - mountPath: /host-mnt
               name: host-mnt
       containers:
-        - name: noop
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
-          command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+        - name: pong
+          image: reg.whoisnian.com/k8s-example/k8s-example-test:TAG_SHOULD_NOT_EXIST
+          ports:
+            - containerPort: 8080
       volumes:
         - name: host-mnt
           hostPath:

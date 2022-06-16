@@ -6,6 +6,14 @@ spec:
   template:
     spec:
       initContainers:
+        - name: ping
+          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          command:
+            [
+              "sh",
+              "-c",
+              "for i in $(seq 1 10); do sleep 3; if wget -O- http://init-node:8080/ping; then exit 0; fi; done; exit 1",
+            ]
         - name: prepare-dirs
           image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
           command: ["sh", "/scripts/prepare-dirs.sh"]
@@ -21,9 +29,10 @@ spec:
             - mountPath: /public
               name: local-public
       containers:
-        - name: noop
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
-          command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+        - name: pong
+          image: reg.whoisnian.com/k8s-example/k8s-example-test:TAG_SHOULD_NOT_EXIST
+          ports:
+            - containerPort: 8080
       volumes:
         - name: local-public
           persistentVolumeClaim:

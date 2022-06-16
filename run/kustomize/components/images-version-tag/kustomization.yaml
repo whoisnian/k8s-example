@@ -11,3 +11,5 @@ images:
     newTag: mainline-alpine
   - name: reg.whoisnian.com/proxy.docker.io/library/alpine # for base/init-node & base/init-public
     newTag: "3.15"
+  - name: reg.whoisnian.com/k8s-example/k8s-example-test # for base/init-node & base/init-public
+    newTag: v0.0.5
