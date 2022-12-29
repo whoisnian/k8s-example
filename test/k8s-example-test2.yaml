@@ -19,7 +19,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: MODE_FILE
+            - name: CFG_MODEFILE
               value: "/config/mode8080"
           volumeMounts:
             - mountPath: /config/
@@ -34,11 +34,11 @@ spec:
           ports:
             - containerPort: 8081
           env:
-            - name: LISTEN_ADDR
+            - name: CFG_LISTENADDR
               value: "0.0.0.0:8081"
-            - name: UPSTREAM
+            - name: CFG_UPSTREAM
               value: "http://127.0.0.1:8080/upstream"
-            - name: MODE_FILE
+            - name: CFG_MODEFILE
               value: "/config/mode8081"
           volumeMounts:
             - mountPath: /config/

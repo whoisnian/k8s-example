@@ -30,7 +30,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: POD_NAME
+            - name: CFG_PODNAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
@@ -71,7 +71,7 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: POD_NAME
+            - name: CFG_PODNAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name

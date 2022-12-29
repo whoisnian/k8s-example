@@ -11,50 +11,40 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/whoisnian/glb/config"
 	"github.com/whoisnian/glb/httpd"
 	"github.com/whoisnian/glb/logger"
 )
 
 var (
 	// config env
-	listenAddr = "0.0.0.0:8080"
-	upstream   = ""
-	modeFile   = "./mode"
-	podName    = "unknown"
+	CFG struct {
+		ListenAddr string `flag:"l,0.0.0.0:8080,Server listen addr"`
+		Upstream   string `flag:"u,,Reverse proxy target"`
+		ModeFile   string `flag:"m,./mode,Path of modefile"`
+		PodName    string `flag:"n,unknown,Present instance name"`
+	}
 
 	// runtime flag
-	modeList   = []string{"normal", "reject", "panic"}
-	serverMode = "normal"
+	modeList = []string{"normal", "reject", "panic"}
 
 	// constant
 	MiB = bytes.Repeat([]byte("0123456789abcdef"), 65536)
 )
 
-func init() {
-	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
-		listenAddr = val
-	}
-	if val, ok := os.LookupEnv("UPSTREAM"); ok {
-		upstream = val
-	}
-	if val, ok := os.LookupEnv("MODE_FILE"); ok {
-		modeFile = val
-	}
-	if val, ok := os.LookupEnv("POD_NAME"); ok {
-		podName = val
-	}
+func parseMode(modeFile string) string {
 	if f, err := os.Open(modeFile); err == nil {
 		defer f.Close()
 		if fbuf, err := io.ReadAll(f); err == nil {
 			fstr := string(bytes.TrimSpace(fbuf))
 			for _, mode := range modeList {
 				if fstr == mode {
-					serverMode = mode
-					break
+					return mode
 				}
 			}
 		}
 	}
+	return "normal"
 }
 
 func pingHandler(store *httpd.Store) {
@@ -83,10 +73,10 @@ func memHandler(store *httpd.Store) {
 
 func upstreamHandler(store *httpd.Store) {
 	logger.Debug("Received upstream request.")
-	if upstream == "" {
+	if CFG.Upstream == "" {
 		store.Respond200([]byte("success\n"))
 	} else {
-		resp, err := http.Get(upstream)
+		resp, err := http.Get(CFG.Upstream)
 		if err != nil {
 			logger.Panic(err)
 		}
@@ -97,11 +87,16 @@ func upstreamHandler(store *httpd.Store) {
 
 func podnameHandler(store *httpd.Store) {
 	logger.Debug("Received podname request.")
-	store.Respond200([]byte(podName + "\n"))
+	store.Respond200([]byte(CFG.PodName + "\n"))
 }
 
 func main() {
 	logger.SetDebug(true)
+	if err := config.FromCommandLine(&CFG); err != nil {
+		logger.Panic(err)
+	}
+
+	serverMode := parseMode(CFG.ModeFile)
 	if serverMode == "panic" {
 		logger.Panic("panic mode")
 	}
@@ -115,7 +110,7 @@ func main() {
 	logger.Info("Service started. (", os.Getpid(), ")")
 	if serverMode != "reject" {
 		go func() {
-			if err := http.ListenAndServe(listenAddr, logger.Req(logger.Recovery(mux))); err != nil {
+			if err := http.ListenAndServe(CFG.ListenAddr, logger.Req(logger.Recovery(mux))); err != nil {
 				logger.Fatal(err)
 			}
 		}()
