@@ -1,6 +1,6 @@
-github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
-github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
-github.com/whoisnian/glb v1.0.0 h1:Nrpgpn45XPrgOJVysyOTB08HpX75uO3gKzrew9QG2iA=
-github.com/whoisnian/glb v1.0.0/go.mod h1:43Ef4TqfYu7a2oKW6JZKsS2WVTCLpechqeGo+1xvu9Y=
-golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d h1:Zu/JngovGLVi6t2J3nmAf3AoTDwuzw85YZ3b9o4yU7s=
-golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 h1:CBpWXWQpIRjzmkkA+M7q9Fqnwd2mZr3AFqexg8YTfoM=
+github.com/go-sql-driver/mysql v1.7.0 h1:ueSltNNllEqE3qcWBTD0iQd3IpL/6U+mJxLkazJ7YPc=
+github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
+github.com/whoisnian/glb v1.1.1 h1:8miHOJWKMeQp9km2iFUIh7SVZQkEj6JO3x2rXrKbqzI=
+github.com/whoisnian/glb v1.1.1/go.mod h1:dw50N/+UXKEOzmbAsL1iCsKf2Q7xIQqish0jWW5uRDE=
+golang.org/x/sys v0.0.0-20220731174439-a90be440212d h1:Sv5ogFZatcgIMMtBSTTAgMYsicp25MXBubjXNDKwm80=
+golang.org/x/term v0.0.0-20220722155259-a9ba230a4035 h1:Q5284mrmYTpACcm+eAKjKJH48BBwSyfJqmmGDTtT8Vc=
