@@ -2,14 +2,14 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 images:
   - name: reg.whoisnian.com/k8s-example/backend-api # for base/backend-api
-    newTag: v0.0.3
+    newTag: v0.0.4
   - name: reg.whoisnian.com/k8s-example/backend-file # for base/backend-file
-    newTag: v0.0.3
-  - name: reg.whoisnian.com/k8s-example/frontend # for base/init-public
-    newTag: v1.0.1
+    newTag: v0.0.4
+  - name: reg.whoisnian.com/k8s-example/frontend-static # for base/init-public
+    newTag: v1.0.2
   - name: reg.whoisnian.com/proxy.docker.io/library/nginx # for base/frontend
     newTag: mainline-alpine
   - name: reg.whoisnian.com/proxy.docker.io/library/alpine # for base/init-node & base/init-public
-    newTag: "3.15"
+    newTag: "3.17"
   - name: reg.whoisnian.com/k8s-example/k8s-example-test # for base/init-node & base/init-public
-    newTag: v0.0.5
+    newTag: v0.0.6

@@ -23,7 +23,7 @@ spec:
             - mountPath: /scripts
               name: scripts
         - name: cp-frontend-static
-          image: reg.whoisnian.com/k8s-example/frontend:TAG_SHOULD_NOT_EXIST
+          image: reg.whoisnian.com/k8s-example/frontend-static:TAG_SHOULD_NOT_EXIST
           command: ["cp", "-r", "/app/html/.", "-t", "/public"]
           volumeMounts:
             - mountPath: /public

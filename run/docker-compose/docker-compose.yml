@@ -17,17 +17,17 @@ services:
     volumes:
       - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
   frontend:
-    image: reg.whoisnian.com/k8s-example/frontend:v0.0.2
+    image: reg.whoisnian.com/k8s-example/frontend-nginx:v1.0.2
     restart: always
   backend-file:
-    image: reg.whoisnian.com/k8s-example/backend-file:v0.0.2
+    image: reg.whoisnian.com/k8s-example/backend-file:v0.0.4
     restart: always
     environment:
       - CFG_APIPREFIX=http://backend-api:8080
     volumes:
       - uploads:/app/uploads
   backend-api:
-    image: reg.whoisnian.com/k8s-example/backend-api:v0.0.3
+    image: reg.whoisnian.com/k8s-example/backend-api:v0.0.4
     depends_on:
       - db
     restart: always

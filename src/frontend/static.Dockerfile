@@ -1,4 +1,4 @@
-FROM reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+FROM reg.whoisnian.com/proxy.docker.io/library/alpine:3.17
 
 COPY html /app/html
 

@@ -18,6 +18,8 @@ nginx -p ./ -c ./nginx/nginx.dev.conf
 ```sh
 cd src/frontend
 TAG=$(cat VERSION)
-docker build . -t reg.whoisnian.com/k8s-example/frontend:$TAG
-docker push reg.whoisnian.com/k8s-example/frontend:$TAG
+docker build . -f static.Dockerfile -t reg.whoisnian.com/k8s-example/frontend-static:$TAG
+docker push reg.whoisnian.com/k8s-example/frontend-static:$TAG
+docker build . -f nginx.Dockerfile -t reg.whoisnian.com/k8s-example/frontend-nginx:$TAG
+docker push reg.whoisnian.com/k8s-example/frontend-nginx:$TAG
 ```
