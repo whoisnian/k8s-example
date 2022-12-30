@@ -5,34 +5,22 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/whoisnian/glb/config"
 	"github.com/whoisnian/glb/httpd"
 	"github.com/whoisnian/glb/logger"
 )
 
-var (
-	listenAddr = "0.0.0.0:8080"
-	filePrefix = "http://127.0.0.1:8081"
-	mysqlDSN   = "k8s:KxY8cSAWz1WJEfs3@tcp(127.0.0.1:3306)/k8s"
-
-	db *sql.DB
-)
-
-func init() {
-	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
-		listenAddr = val
-	}
-	if val, ok := os.LookupEnv("FILE_PREFIX"); ok {
-		filePrefix = val
-	}
-	if val, ok := os.LookupEnv("MYSQL_DSN"); ok {
-		mysqlDSN = val
-	}
+var CFG struct {
+	ListenAddr string `flag:"l,0.0.0.0:8080,Server listen addr"`
+	FilePrefix string `flag:"f,http://127.0.0.1:8081,Url prefix of file service"`
+	MysqlDSN   string `flag:"d,k8s:KxY8cSAWz1WJEfs3@tcp(127.0.0.1:3306)/k8s,Mysql data source name"`
 }
+
+var db *sql.DB
 
 type fileInfo struct {
 	Cid  string
@@ -88,7 +76,7 @@ func deleteFileHandler(store *httpd.Store) {
 	}
 
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", filePrefix+"/self/file/data?cid="+url.QueryEscape(cid), nil)
+	req, err := http.NewRequest("DELETE", CFG.FilePrefix+"/self/file/data?cid="+url.QueryEscape(cid), nil)
 	if err != nil {
 		logger.Panic(err)
 	}
@@ -100,8 +88,12 @@ func deleteFileHandler(store *httpd.Store) {
 }
 
 func main() {
+	if err := config.FromCommandLine(&CFG); err != nil {
+		logger.Panic(err)
+	}
+
 	var err error
-	db, err = sql.Open("mysql", mysqlDSN)
+	db, err = sql.Open("mysql", CFG.MysqlDSN)
 	if err != nil {
 		logger.Fatal(err)
 	}
@@ -120,7 +112,7 @@ func main() {
 	mux.Handle("/api/file", "DELETE", deleteFileHandler)
 
 	logger.Info("API service started.")
-	if err := http.ListenAndServe(listenAddr, logger.Req(logger.Recovery(mux))); err != nil {
+	if err := http.ListenAndServe(CFG.ListenAddr, logger.Req(logger.Recovery(mux))); err != nil {
 		logger.Fatal(err)
 	}
 }

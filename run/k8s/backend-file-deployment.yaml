@@ -20,7 +20,7 @@ spec:
           ports:
             - containerPort: 8081
           env:
-            - name: API_PREFIX
+            - name: CFG_APIPREFIX
               value: http://backend-api:8080
           volumeMounts:
             - mountPath: /app/uploads

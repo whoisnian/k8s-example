@@ -9,11 +9,11 @@ file meta data
 | DELETE | /api/file      | delete file                  |
 
 ## config
-| env name    | default value                                |
-| ----------- | -------------------------------------------- |
-| LISTEN_ADDR | 0.0.0.0:8080                                 |
-| FILE_PREFIX | http://127.0.0.1:8081                        |
-| MYSQL_DSN   | k8s:KxY8cSAWz1WJEfs3@tcp(127.0.0.1:3306)/k8s |
+| env name       | default value                                |
+| -------------- | -------------------------------------------- |
+| CFG_LISTENADDR | 0.0.0.0:8080                                 |
+| CFG_FILEPREFIX | http://127.0.0.1:8081                        |
+| CFG_MYSQLDSN   | k8s:KxY8cSAWz1WJEfs3@tcp(127.0.0.1:3306)/k8s |
 
 ## start
 ```sh

@@ -12,9 +12,9 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: FILE_PREFIX
+            - name: CFG_FILEPREFIX
               value: http://backend-file:8081
-            - name: MYSQL_DSN
+            - name: CFG_MYSQLDSN
               valueFrom:
                 secretKeyRef:
                   name: mysql-dsn

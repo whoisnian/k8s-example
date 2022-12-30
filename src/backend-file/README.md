@@ -9,11 +9,11 @@ persistent file storage
 | GET    | /file/data      | download file          |
 
 ## config
-| env name    | default value         |
-| ----------- | --------------------- |
-| LISTEN_ADDR | 0.0.0.0:8081          |
-| API_PREFIX  | http://127.0.0.1:8080 |
-| ROOT_PATH   | ./uploads             |
+| env name       | default value         |
+| -------------- | --------------------- |
+| CFG_LISTENADDR | 0.0.0.0:8081          |
+| CFG_APIPREFIX  | http://127.0.0.1:8080 |
+| CFG_ROOTPATH   | ./uploads             |
 
 ## start
 ```sh

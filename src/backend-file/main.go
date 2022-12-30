@@ -10,27 +10,16 @@ import (
 	"os"
 	"time"
 
+	"github.com/whoisnian/glb/config"
 	"github.com/whoisnian/glb/httpd"
 	"github.com/whoisnian/glb/logger"
 	"github.com/whoisnian/glb/util/fsutil"
 )
 
-var (
-	listenAddr = "0.0.0.0:8081"
-	apiPrefix  = "http://127.0.0.1:8080"
-	rootPath   = "./uploads"
-)
-
-func init() {
-	if val, ok := os.LookupEnv("LISTEN_ADDR"); ok {
-		listenAddr = val
-	}
-	if val, ok := os.LookupEnv("API_PREFIX"); ok {
-		apiPrefix = val
-	}
-	if val, ok := os.LookupEnv("ROOT_PATH"); ok {
-		rootPath = val
-	}
+var CFG struct {
+	ListenAddr string `flag:"l,0.0.0.0:8081,Server listen addr"`
+	ApiPrefix  string `flag:"a,http://127.0.0.1:8080,Url prefix of api service"`
+	RootPath   string `flag:"p,./uploads,Path of storage"`
 }
 
 type fileInfo struct {
@@ -42,7 +31,7 @@ type fileInfo struct {
 
 func selfDeleteFileHandler(store *httpd.Store) {
 	cid := store.R.FormValue("cid")
-	path := fsutil.ResolveBase(rootPath, cid)
+	path := fsutil.ResolveBase(CFG.RootPath, cid)
 	if err := os.Remove(path); err != nil {
 		logger.Panic(err)
 	}
@@ -64,7 +53,7 @@ func uploadFileHandler(store *httpd.Store) {
 	}
 	cid := hex.EncodeToString(buf)
 	// check existing
-	path := fsutil.ResolveBase(rootPath, cid)
+	path := fsutil.ResolveBase(CFG.RootPath, cid)
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		logger.Panic("random cid duplicated")
 	}
@@ -83,7 +72,7 @@ func uploadFileHandler(store *httpd.Store) {
 	if err != nil {
 		logger.Panic(err)
 	}
-	_, err = http.Post(apiPrefix+"/self/api/file", "application/json", bytes.NewBuffer(body))
+	_, err = http.Post(CFG.ApiPrefix+"/self/api/file", "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		logger.Panic(err)
 	}
@@ -92,7 +81,7 @@ func uploadFileHandler(store *httpd.Store) {
 
 func downloadFileHandler(store *httpd.Store) {
 	cid := store.R.FormValue("cid")
-	path := fsutil.ResolveBase(rootPath, cid)
+	path := fsutil.ResolveBase(CFG.RootPath, cid)
 	file, err := os.Open(path)
 	if err != nil {
 		logger.Panic(err)
@@ -108,12 +97,16 @@ func downloadFileHandler(store *httpd.Store) {
 }
 
 func main() {
-	info, err := os.Stat(rootPath)
+	if err := config.FromCommandLine(&CFG); err != nil {
+		logger.Panic(err)
+	}
+
+	info, err := os.Stat(CFG.RootPath)
 	if err == nil && !info.IsDir() {
 		logger.Fatal("root path is not a directory")
 	} else if os.IsNotExist(err) {
 		logger.Info("create root directory")
-		err = os.MkdirAll(rootPath, 0755)
+		err = os.MkdirAll(CFG.RootPath, 0755)
 	}
 	if err != nil {
 		logger.Fatal(err)
@@ -125,7 +118,7 @@ func main() {
 	mux.Handle("/file/data", "GET", downloadFileHandler)
 
 	logger.Info("FILE service started.")
-	if err := http.ListenAndServe(listenAddr, logger.Req(logger.Recovery(mux))); err != nil {
+	if err := http.ListenAndServe(CFG.ListenAddr, logger.Req(logger.Recovery(mux))); err != nil {
 		logger.Fatal(err)
 	}
 }
