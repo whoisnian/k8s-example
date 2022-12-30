@@ -1,8 +1,14 @@
 # 测试 NodePort 暴露服务
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k8s-example-test
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8s-example-test
+  namespace: k8s-example-test
 spec:
   replicas: 4
   selector:
@@ -14,10 +20,15 @@ spec:
         k8s-example: k8s-example-test
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.4
+        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.6
           name: k8s-example-test
           ports:
             - containerPort: 8080
+          env:
+            - name: CFG_PODNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           resources:
             requests:
               memory: "256Mi"
@@ -31,6 +42,7 @@ metadata:
   labels:
     k8s-example: k8s-example-test
   name: k8s-example-test
+  namespace: k8s-example-test
 spec:
   ports:
     - port: 8080
