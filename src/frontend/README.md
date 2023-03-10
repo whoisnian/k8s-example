@@ -1,4 +1,4 @@
-# frontend
+# k8s-example-frontend
 frontend served by nginx
 
 ## routes
@@ -9,17 +9,17 @@ frontend served by nginx
 
 ## start
 ```sh
-cd src/frontend
+# pwd: src/frontend
 nginx -p ./ -c ./nginx/nginx.dev.conf
 # then visit http://127.0.0.1:8082
 ```
 
 ## build
 ```sh
-cd src/frontend
+# pwd: src/frontend
 TAG=$(cat VERSION)
-docker build . -f static.Dockerfile -t reg.whoisnian.com/k8s-example/frontend-static:$TAG
-docker push reg.whoisnian.com/k8s-example/frontend-static:$TAG
-docker build . -f nginx.Dockerfile -t reg.whoisnian.com/k8s-example/frontend-nginx:$TAG
-docker push reg.whoisnian.com/k8s-example/frontend-nginx:$TAG
+docker build . -f static.Dockerfile -t ghcr.io/whoisnian/k8s-example-frontend-static:$TAG
+docker push ghcr.io/whoisnian/k8s-example-frontend-static:$TAG
+docker build . -f nginx.Dockerfile -t ghcr.io/whoisnian/k8s-example-frontend-nginx:$TAG
+docker push ghcr.io/whoisnian/k8s-example-frontend-nginx:$TAG
 ```

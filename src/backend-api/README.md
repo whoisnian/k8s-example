@@ -1,4 +1,4 @@
-# backend-api
+# k8s-example-backend-api
 file meta data
 
 ## routes
@@ -17,7 +17,7 @@ file meta data
 
 ## start
 ```sh
-cd src/backend-api
+# pwd: src/backend-api
 go run main.go
 ```
 
@@ -35,10 +35,10 @@ docker run --net host -d --name mysql-dev \
 
 ## build
 ```sh
-cd src/backend-api
+# pwd: src/backend-api
 cp ../../go.mod ../../go.sum ./
 TAG=$(cat VERSION)
-docker build . -t reg.whoisnian.com/k8s-example/backend-api:$TAG
-docker push reg.whoisnian.com/k8s-example/backend-api:$TAG
+docker build . -t ghcr.io/whoisnian/k8s-example-backend-api:$TAG
+docker push ghcr.io/whoisnian/k8s-example-backend-api:$TAG
 rm ./go.mod ./go.sum
 ```

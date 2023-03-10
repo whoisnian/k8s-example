@@ -1,4 +1,6 @@
-FROM reg.whoisnian.com/proxy.docker.io/library/alpine:3.17
+FROM alpine:3.17
+
+LABEL org.opencontainers.image.source https://github.com/whoisnian/k8s-example
 
 COPY html /app/html
 

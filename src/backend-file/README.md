@@ -1,4 +1,4 @@
-# backend-file
+# k8s-example-backend-file
 persistent file storage
 
 ## routes
@@ -17,16 +17,16 @@ persistent file storage
 
 ## start
 ```sh
-cd src/backend-file
+# pwd: src/backend-file
 go run main.go
 ```
 
 ## build
 ```sh
-cd src/backend-file
+# pwd: src/backend-file
 cp ../../go.mod ../../go.sum ./
 TAG=$(cat VERSION)
-docker build . -t reg.whoisnian.com/k8s-example/backend-file:$TAG
-docker push reg.whoisnian.com/k8s-example/backend-file:$TAG
+docker build . -t ghcr.io/whoisnian/k8s-example-backend-file:$TAG
+docker push ghcr.io/whoisnian/k8s-example-backend-file:$TAG
 rm ./go.mod ./go.sum
 ```
