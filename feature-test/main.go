@@ -48,7 +48,7 @@ func parseMode(modeFile string) string {
 }
 
 func pingHandler(store *httpd.Store) {
-	logger.Debug("Received ping request.")
+	logger.Info("Received ping request.")
 	store.Respond200([]byte("pong\n"))
 }
 
@@ -57,7 +57,7 @@ func memHandler(store *httpd.Store) {
 	if err != nil {
 		logger.Panic(err)
 	}
-	logger.Debug("Received mem (", cnt, ") request.")
+	logger.Info("Received mem (", cnt, ") request.")
 
 	buf := [][]byte{}
 	for i := 0; i < cnt; i++ {
@@ -72,7 +72,7 @@ func memHandler(store *httpd.Store) {
 }
 
 func upstreamHandler(store *httpd.Store) {
-	logger.Debug("Received upstream request.")
+	logger.Info("Received upstream request.")
 	if CFG.Upstream == "" {
 		store.Respond200([]byte("success\n"))
 	} else {
@@ -86,12 +86,11 @@ func upstreamHandler(store *httpd.Store) {
 }
 
 func podnameHandler(store *httpd.Store) {
-	logger.Debug("Received podname request.")
+	logger.Info("Received podname request.")
 	store.Respond200([]byte(CFG.PodName + "\n"))
 }
 
 func main() {
-	logger.SetDebug(true)
 	if err := config.FromCommandLine(&CFG); err != nil {
 		logger.Panic(err)
 	}

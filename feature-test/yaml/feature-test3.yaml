@@ -12,21 +12,21 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-example-1
+  name: feature-test
   namespace: k8s-example-1
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-example: k8s-example-1
+      k8s-example: feature-test
   template:
     metadata:
       labels:
-        k8s-example: k8s-example-1
+        k8s-example: feature-test
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.5
-          name: k8s-example-1
+        - image: ghcr.io/whoisnian/feature-test:v0.0.7
+          name: feature-test
           ports:
             - containerPort: 8080
           env:
@@ -38,9 +38,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    k8s-example: k8s-example-1
-  name: k8s-example-1
+  name: feature-test
   namespace: k8s-example-1
 spec:
   ports:
@@ -48,26 +46,26 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    k8s-example: k8s-example-1
+    k8s-example: feature-test
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-example-2
+  name: feature-test
   namespace: k8s-example-2
 spec:
   replicas: 2
   selector:
     matchLabels:
-      k8s-example: k8s-example-2
+      k8s-example: feature-test
   template:
     metadata:
       labels:
-        k8s-example: k8s-example-2
+        k8s-example: feature-test
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/k8s-example-test:v0.0.5
-          name: k8s-example-2
+        - image: ghcr.io/whoisnian/feature-test:v0.0.7
+          name: feature-test
           ports:
             - containerPort: 8080
           env:
@@ -79,9 +77,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    k8s-example: k8s-example-2
-  name: k8s-example-2
+  name: feature-test
   namespace: k8s-example-2
 spec:
   ports:
@@ -89,7 +85,7 @@ spec:
       targetPort: 8080
       protocol: TCP
   selector:
-    k8s-example: k8s-example-2
+    k8s-example: feature-test
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -108,7 +104,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: k8s-example-1
+                name: feature-test
                 port:
                   number: 8080
 ---
@@ -130,6 +126,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: k8s-example-2
+                name: feature-test
                 port:
                   number: 8080

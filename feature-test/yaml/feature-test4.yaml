@@ -15,14 +15,14 @@ spec:
     spec:
       initContainers:
         - name: sleep-30
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+          image: ghcr.io/whoisnian/feature-test:v0.0.7
           command: ["sh", "-c", "sleep 30"]
           volumeMounts:
             - mountPath: /host-mnt
               name: host-mnt
       containers:
         - name: noop
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+          image: ghcr.io/whoisnian/feature-test:v0.0.7
           command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
       volumes:
         - name: host-mnt
@@ -55,9 +55,9 @@ spec:
               topologyKey: kubernetes.io/hostname
       initContainers:
         - name: sleep-30
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+          image: ghcr.io/whoisnian/feature-test:v0.0.7
           command: ["sh", "-c", "sleep 30"]
       containers:
         - name: noop
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:3.15
+          image: ghcr.io/whoisnian/feature-test:v0.0.7
           command: ["sh", "-c", "trap : TERM INT; sleep infinity & wait"]
