@@ -3,6 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: local-public-pvc
 spec:
+  storageClassName: ""
   volumeName: local-public-pv
   accessModes:
     - ReadWriteOnce

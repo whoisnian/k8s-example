@@ -3,10 +3,11 @@ kind: PersistentVolume
 metadata:
   name: uploads-pv
 spec:
+  storageClassName: ""
   capacity:
     storage: 10Gi
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 192.168.122.231
-    path: "/data/uploads"
+    server: 192.168.49.1
+    path: /

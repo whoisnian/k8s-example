@@ -7,7 +7,7 @@ spec:
     spec:
       initContainers:
         - name: ping
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          image: alpine:TAG_SHOULD_NOT_EXIST
           command:
             [
               "sh",
@@ -15,7 +15,7 @@ spec:
               "for i in $(seq 1 10); do sleep 3; if wget -O- http://init-node:8080/ping; then exit 0; fi; done; exit 1",
             ]
         - name: prepare-dirs
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          image: alpine:TAG_SHOULD_NOT_EXIST
           command: ["sh", "/scripts/prepare-dirs.sh"]
           volumeMounts:
             - mountPath: /public
@@ -23,14 +23,14 @@ spec:
             - mountPath: /scripts
               name: scripts
         - name: cp-frontend-static
-          image: reg.whoisnian.com/k8s-example/frontend-static:TAG_SHOULD_NOT_EXIST
+          image: ghcr.io/whoisnian/k8s-example-frontend-static:TAG_SHOULD_NOT_EXIST
           command: ["cp", "-r", "/app/html/.", "-t", "/public"]
           volumeMounts:
             - mountPath: /public
               name: local-public
       containers:
         - name: pong
-          image: reg.whoisnian.com/k8s-example/k8s-example-test:TAG_SHOULD_NOT_EXIST
+          image: ghcr.io/whoisnian/feature-test:TAG_SHOULD_NOT_EXIST
           ports:
             - containerPort: 8080
       volumes:

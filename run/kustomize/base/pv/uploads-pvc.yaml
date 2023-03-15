@@ -3,6 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: uploads-pvc
 spec:
+  storageClassName: ""
   volumeName: uploads-pv
   accessModes:
     - ReadWriteMany

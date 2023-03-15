@@ -7,14 +7,14 @@ spec:
     spec:
       initContainers:
         - name: prepare-dirs
-          image: reg.whoisnian.com/proxy.docker.io/library/alpine:TAG_SHOULD_NOT_EXIST
+          image: alpine:TAG_SHOULD_NOT_EXIST
           command: ["install", "--mode=0755", "--directory", "/host-mnt/public"] # --owner=500 --group=500
           volumeMounts:
             - mountPath: /host-mnt
               name: host-mnt
       containers:
         - name: pong
-          image: reg.whoisnian.com/k8s-example/k8s-example-test:TAG_SHOULD_NOT_EXIST
+          image: ghcr.io/whoisnian/feature-test:TAG_SHOULD_NOT_EXIST
           ports:
             - containerPort: 8080
       volumes:
