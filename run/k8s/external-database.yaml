@@ -4,7 +4,7 @@ metadata:
   name: external-database
 subsets:
   - addresses:
-      - ip: 192.168.122.231
+      - ip: 192.168.49.1
     ports:
       - port: 3306
 ---

@@ -10,24 +10,24 @@ services:
     volumes:
       - db-data:/var/lib/mysql
   nginx:
-    image: reg.whoisnian.com/proxy.docker.io/library/nginx:mainline-alpine
+    image: nginx:mainline-alpine
     restart: always
     ports:
       - "8090:80"
     volumes:
       - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
   frontend:
-    image: reg.whoisnian.com/k8s-example/frontend-nginx:v1.0.2
+    image: ghcr.io/whoisnian/k8s-example-frontend-nginx:v1.0.3
     restart: always
   backend-file:
-    image: reg.whoisnian.com/k8s-example/backend-file:v0.0.4
+    image: ghcr.io/whoisnian/k8s-example-backend-file:v0.0.5
     restart: always
     environment:
       - CFG_APIPREFIX=http://backend-api:8080
     volumes:
       - uploads:/app/uploads
   backend-api:
-    image: reg.whoisnian.com/k8s-example/backend-api:v0.0.4
+    image: ghcr.io/whoisnian/k8s-example-backend-api:v0.0.5
     depends_on:
       - db
     restart: always

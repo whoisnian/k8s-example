@@ -13,7 +13,7 @@ spec:
         k8s-example: backend-api
     spec:
       containers:
-        - image: reg.whoisnian.com/k8s-example/backend-api:v0.0.4
+        - image: ghcr.io/whoisnian/k8s-example-backend-api:v0.0.5
           name: backend-api
           ports:
             - containerPort: 8080

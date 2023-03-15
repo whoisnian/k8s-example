@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: version-config
 data:
-  VERSION_JSON: '{"backend-api":"v0.0.4","backend-file":"v0.0.4","frontend-nginx":"v1.0.2"}'
+  VERSION_JSON: '{"backend-api":"v0.0.5","backend-file":"v0.0.5","frontend-nginx":"v1.0.3"}'
