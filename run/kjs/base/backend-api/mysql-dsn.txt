@@ -1,0 +1,1 @@
+k8s:KxY8cSAWz1WJEfs3@tcp(192.168.49.1:3306)/k8s

@@ -1,0 +1,11 @@
+{
+  "name": "kjs",
+  "version": "0.0.1",
+  "description": "kustomize but nodejs",
+  "scripts": {
+    "generate": "node ./overlays/generate.js"
+  },
+  "devDependencies": {
+    "standard": "^17.0.0"
+  }
+}

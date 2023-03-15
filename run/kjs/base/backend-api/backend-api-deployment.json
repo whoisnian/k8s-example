@@ -1,0 +1,41 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "backend-api"
+  },
+  "spec": {
+    "replicas": 2,
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "image": "ghcr.io/whoisnian/k8s-example-backend-api:TAG_SHOULD_NOT_EXIST",
+            "name": "backend-api",
+            "ports": [
+              {
+                "containerPort": 8080
+              }
+            ],
+            "env": [
+              {
+                "name": "CFG_FILEPREFIX",
+                "value": "http://backend-file:8081"
+              },
+              {
+                "name": "CFG_MYSQLDSN",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "mysql-dsn",
+                    "key": "dsnStr",
+                    "optional": false
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

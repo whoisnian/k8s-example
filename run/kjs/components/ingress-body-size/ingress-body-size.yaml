@@ -1,0 +1,3 @@
+- op: add
+  path: /metadata/annotations/nginx.ingress.kubernetes.io~1proxy-body-size
+  value: 64m

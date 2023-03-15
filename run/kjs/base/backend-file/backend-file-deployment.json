@@ -1,0 +1,45 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "backend-file"
+  },
+  "spec": {
+    "replicas": 4,
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "image": "ghcr.io/whoisnian/k8s-example-backend-file:TAG_SHOULD_NOT_EXIST",
+            "name": "backend-file",
+            "ports": [
+              {
+                "containerPort": 8081
+              }
+            ],
+            "env": [
+              {
+                "name": "CFG_APIPREFIX",
+                "value": "http://backend-api:8080"
+              }
+            ],
+            "volumeMounts": [
+              {
+                "mountPath": "/app/uploads",
+                "name": "uploads"
+              }
+            ]
+          }
+        ],
+        "volumes": [
+          {
+            "name": "uploads",
+            "persistentVolumeClaim": {
+              "claimName": "uploads-pvc"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
