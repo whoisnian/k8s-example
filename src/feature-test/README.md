@@ -4,6 +4,7 @@
 * yaml/feature-test3.yaml: 测试双 namespace 使用 ingress-nginx.canary 实现灰度上线
 * yaml/feature-test4.yaml: 测试 pod 初始化 host 目录及 podAffinity 建立依赖关系
 * yaml/feature-test5.yaml: 测试 pod 利用 initContainers 强制设定启动顺序
+* yaml/feature-test6.yaml: 测试 emptyDir 内存占用触发 pod 的 OOM
 
 ## routes
 | method | path      | description                         | usage                                      |
