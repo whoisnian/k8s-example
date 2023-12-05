@@ -5,6 +5,7 @@
 * yaml/feature-test4.yaml: 测试 pod 初始化 host 目录及 podAffinity 建立依赖关系
 * yaml/feature-test5.yaml: 测试 pod 利用 initContainers 强制设定启动顺序
 * yaml/feature-test6.yaml: 测试 emptyDir 内存占用触发 pod 的 OOM
+* yaml/feature-test7.yaml: 测试不同 deployment 下的不同 pod 是否复用 nfs 连接
 
 ## routes
 | method | path      | description                         | usage                                      |
