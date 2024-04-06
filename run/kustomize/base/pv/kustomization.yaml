@@ -1,5 +1,0 @@
-resources:
-  - ./local-public-pv.yaml
-  - ./local-public-pvc.yaml
-  - ./uploads-pv.yaml
-  - ./uploads-pvc.yaml
