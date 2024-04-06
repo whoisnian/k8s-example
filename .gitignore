@@ -1,5 +1,0 @@
-# Ignore vscode
-.vscode
-
-# Ignore dataDir
-src/backend-file/uploads
