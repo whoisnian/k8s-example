@@ -5,6 +5,14 @@
 * file
 * fe
 
+## deps
+* mysql
+* nfs
+* minio
+* jaeger
+* prom
+* efk
+
 ## run
 * docker-compose
 * raw-yaml
