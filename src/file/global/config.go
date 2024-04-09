@@ -1,37 +1,52 @@
 package global
 
 import (
+	"encoding/json"
 	"os"
 )
 
-var (
-	CFG_DEBUG   bool // enable debug output
-	CFG_VERSION bool // show version and quit
+var CFG Config
 
-	CFG_LISTENADDR  string // server listen addr
-	CFG_DATABASEURI string // database connection URI
+type Config struct {
+	Debug   bool // enable debug output
+	Version bool // show version and quit
 
-	CFG_STORAGE      string // storage mode, file or s3
-	CFG_FILE_ROOT    string // file-storage: root directory
-	CFG_S3_ENDPOINT  string // s3-storage: endpoint
-	CFG_S3_ACCESSKEY string // s3-storage: access key id
-	CFG_S3_SECRETKEY string // s3-storage: secret access key
-	CFG_S3_SECURE    bool   // s3-storage: secure transport
-)
+	ListenAddr  string // server listen addr
+	DatabaseURI string // database connection URI
+
+	StorageDriver string // storage driver, filesystem or aws-s3
+	RootDirectory string // filesystem: root directory
+	S3Endpoint    string // aws-s3: endpoint
+	S3AccessKey   string // aws-s3: access key id
+	S3SecretKey   string // aws-s3: secret access key
+	S3Secure      bool   // aws-s3: secure transport
+}
 
 func SetupConfig() {
-	CFG_DEBUG = boolFromEnv("CFG_DEBUG", false)
-	CFG_VERSION = boolFromEnv("CFG_VERSION", false)
+	if filename, ok := os.LookupEnv("CFG_CONFIG"); ok {
+		fi, err := os.Open(filename)
+		if err != nil {
+			panic(err)
+		}
+		defer fi.Close()
 
-	CFG_LISTENADDR = stringFromEnv("CFG_LISTENADDR", "0.0.0.0:8081")
-	CFG_DATABASEURI = stringFromEnv("CFG_DATABASEURI", "root:password@tcp(127.0.0.1:3306)/dbname")
+		if err = json.NewDecoder(fi).Decode(&CFG); err != nil {
+			panic(err)
+		}
+	} else {
+		CFG.Debug = boolFromEnv("CFG_DEBUG", false)
+		CFG.Version = boolFromEnv("CFG_VERSION", false)
 
-	CFG_STORAGE = stringFromEnv("CFG_STORAGE", "file")
-	CFG_FILE_ROOT = stringFromEnv("CFG_FILE_ROOT", "./uploads")
-	CFG_S3_ENDPOINT = stringFromEnv("CFG_S3_ENDPOINT", "https://s3.amazonaws.com")
-	CFG_S3_ACCESSKEY = stringFromEnv("CFG_S3_ACCESSKEY", "BKJIK5AABMIBU2OMRH6B")
-	CFG_S3_SECRETKEY = stringFromEnv("CFG_S3_SECRETKEY", "V7f1wqCQAc0woUEc8IEj5gUJVS5SQxhQo9SGr1r2")
-	CFG_S3_SECURE = boolFromEnv("CFG_S3_SECURE", true)
+		CFG.ListenAddr = stringFromEnv("CFG_LISTENADDR", "0.0.0.0:8081")
+		CFG.DatabaseURI = stringFromEnv("CFG_DATABASEURI", "root:password@tcp(127.0.0.1:3306)/dbname")
+
+		CFG.StorageDriver = stringFromEnv("CFG_STORAGEDRIVER", "filesystem")
+		CFG.RootDirectory = stringFromEnv("CFG_ROOTDIRECTORY", "./uploads")
+		CFG.S3Endpoint = stringFromEnv("CFG_S3ENDPOINT", "https://s3.amazonaws.com")
+		CFG.S3AccessKey = stringFromEnv("CFG_S3ACCESSKEY", "QZH1XZPZLP8DA3GKA3J1")
+		CFG.S3SecretKey = stringFromEnv("CFG_S3SECRETKEY", "VQyou21kIHVuKLkULNaETFnN7kLstyiX2KEtVbuI")
+		CFG.S3Secure = boolFromEnv("CFG_S3SECURE", true)
+	}
 }
 
 func boolFromEnv(envKey string, defVal bool) bool {
