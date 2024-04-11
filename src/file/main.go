@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,10 +12,12 @@ import (
 
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/router"
+	"go.uber.org/zap"
 )
 
 func main() {
 	global.SetupConfig()
+	global.SetupLogger()
 
 	if global.CFG.Version {
 		fmt.Printf("%s %s(%s)\n", global.AppName, global.Version, global.BuildTime)
@@ -31,11 +32,11 @@ func main() {
 		MaxHeaderBytes:    http.DefaultMaxHeaderBytes,
 	}
 	go func() {
-		log.Printf("service is starting: http://%s", global.CFG.ListenAddr)
+		global.LOG.Info("service is starting", zap.String("addr", global.CFG.ListenAddr))
 		if err := server.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
-			log.Printf("service is shutting down")
+			global.LOG.Warn("service is shutting down")
 		} else if err != nil {
-			log.Fatalln(err)
+			global.LOG.Fatal(err.Error())
 		}
 	}()
 
@@ -44,9 +45,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Println(err)
+		global.LOG.Warn(err.Error())
 	}
-	log.Println("service has been shut down")
+	global.LOG.Info("service has been shut down")
 }
 
 func waitFor(signals ...os.Signal) {
