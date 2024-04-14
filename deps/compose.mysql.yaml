@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.0
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    restart: always
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - path: compose.mysql.env
+        required: true
+    ports:
+      - 3306:3306
+
+volumes:
+  mysql_data:
