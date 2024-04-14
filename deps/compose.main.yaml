@@ -1,0 +1,4 @@
+name: k8s-example
+
+include:
+  - path: compose.mysql.yaml
