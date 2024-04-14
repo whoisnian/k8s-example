@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -19,6 +20,17 @@ import (
 func Setup() *gin.Engine {
 	if global.CFG.Debug {
 		gin.SetMode(gin.DebugMode)
+		gin.DebugPrintFunc = func(format string, values ...interface{}) {
+			global.LOG.Debug(fmt.Sprintf("[GIN-debug] "+format, values...))
+		}
+		gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+			global.LOG.Debug("[GIN-debug] print route",
+				zap.String("method", httpMethod),
+				zap.String("path", absolutePath),
+				zap.String("name", handlerName),
+				zap.Int("len", nuHandlers),
+			)
+		}
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
