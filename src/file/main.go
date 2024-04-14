@@ -18,11 +18,15 @@ import (
 func main() {
 	global.SetupConfig()
 	global.SetupLogger()
+	global.LOG.Info("setup config successfully", zap.Any("CFG", global.CFG))
 
 	if global.CFG.Version {
 		fmt.Printf("%s %s(%s)\n", global.AppName, global.Version, global.BuildTime)
 		return
 	}
+
+	global.SetupMySQL()
+	global.LOG.Info("setup mysql successfully")
 
 	server := &http.Server{
 		Addr:              global.CFG.ListenAddr,
