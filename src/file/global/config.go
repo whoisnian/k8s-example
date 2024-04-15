@@ -11,10 +11,12 @@ type Config struct {
 	Debug   bool // enable debug output
 	Version bool // show version and quit
 
-	ListenAddr string // server listen addr
-	MysqlDSN   string // mysql dsn from https://github.com/go-sql-driver/mysql/blob/master/README.md#dsn-data-source-name
+	ListenAddr  string // server listen addr
+	MysqlDSN    string // mysql dsn from https://github.com/go-sql-driver/mysql/blob/master/README.md#dsn-data-source-name
+	AutoMigrate bool   // automatically migrate mysql schema and quit
 
 	StorageDriver string // storage driver, filesystem or aws-s3
+	StorageBucket string // bucket name for storage rotation
 	RootDirectory string // filesystem: root directory
 	S3Endpoint    string // aws-s3: endpoint
 	S3AccessKey   string // aws-s3: access key id
@@ -39,8 +41,10 @@ func SetupConfig() {
 
 		CFG.ListenAddr = stringFromEnv("CFG_LISTENADDR", "0.0.0.0:8081")
 		CFG.MysqlDSN = stringFromEnv("CFG_MYSQLDSN", "root:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=UTC")
+		CFG.AutoMigrate = boolFromEnv("CFG_AUTOMIGRATE", false)
 
 		CFG.StorageDriver = stringFromEnv("CFG_STORAGEDRIVER", "filesystem")
+		CFG.StorageBucket = stringFromEnv("CFG_STORAGEBUCKET", "bucket01")
 		CFG.RootDirectory = stringFromEnv("CFG_ROOTDIRECTORY", "./uploads")
 		CFG.S3Endpoint = stringFromEnv("CFG_S3ENDPOINT", "https://s3.amazonaws.com")
 		CFG.S3AccessKey = stringFromEnv("CFG_S3ACCESSKEY", "QZH1XZPZLP8DA3GKA3J1")
