@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/whoisnian/k8s-example/src/file/global"
+	"github.com/whoisnian/k8s-example/src/file/model"
 	"github.com/whoisnian/k8s-example/src/file/router"
 	"go.uber.org/zap"
 )
@@ -27,6 +28,12 @@ func main() {
 
 	global.SetupMySQL()
 	global.LOG.Info("setup mysql successfully")
+
+	if global.CFG.AutoMigrate {
+		model.SetupAutoMigrate(global.DB)
+		global.LOG.Info("setup auto-migrate successfully")
+		return
+	}
 
 	server := &http.Server{
 		Addr:              global.CFG.ListenAddr,
