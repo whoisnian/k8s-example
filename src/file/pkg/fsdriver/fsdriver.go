@@ -1,6 +1,8 @@
 package fsdriver
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"io"
 	"io/fs"
@@ -24,23 +26,35 @@ func New(root string) (*Driver, error) {
 	return &Driver{root}, nil
 }
 
-func (dri *Driver) CreateFile(bucket, object string) (io.WriteCloser, error) {
+func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, _ int64) (string, int64, error) {
 	name, err := dri.resolve(bucket, object)
 	if err != nil {
-		return nil, err
+		return "", 0, err
 	}
 
 	parent := filepath.Dir(name)
 	if info, err := os.Stat(parent); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(parent, 0755); err != nil {
-			return nil, err
+			return "", 0, err
 		}
 	} else if err != nil {
-		return nil, err
+		return "", 0, err
 	} else if !info.IsDir() {
-		return nil, errors.New("fsdriver: parent is not a directory")
+		return "", 0, errors.New("fsdriver: parent is not a directory")
 	}
-	return os.Create(name)
+
+	file, err := os.Create(name)
+	if err != nil {
+		return "", 0, err
+	}
+	defer file.Close()
+
+	hasher := sha256.New()
+	size, err := io.Copy(io.MultiWriter(file, hasher), reader)
+	if err != nil {
+		return "", 0, err
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), size, nil
 }
 
 func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {

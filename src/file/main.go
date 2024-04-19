@@ -26,6 +26,8 @@ func main() {
 		return
 	}
 
+	global.SetupStorage()
+	global.LOG.Info("setup storage successfully")
 	global.SetupMySQL()
 	global.LOG.Info("setup mysql successfully")
 
