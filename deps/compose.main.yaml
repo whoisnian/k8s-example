@@ -1,4 +1,5 @@
 name: k8s-example
 
 include:
+  - path: compose.minio.yaml
   - path: compose.mysql.yaml
