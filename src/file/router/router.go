@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
+	"github.com/whoisnian/k8s-example/src/file/router/file"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -41,7 +42,11 @@ func Setup() *gin.Engine {
 	engine.NoRoute()
 	engine.NoMethod()
 
-	engine.GET("/", func(c *gin.Context) { c.String(200, "ok") })
+	// RouterPrefix: /file/
+	engine.Handle(http.MethodGet, "/file/objects", file.ListHandler)
+	engine.Handle(http.MethodPost, "/file/objects", file.CreateHandler)
+	engine.Handle(http.MethodGet, "/file/object/:id", file.DownloadHandler)
+	engine.Handle(http.MethodDelete, "/file/object/:id", file.DeleteHandler)
 
 	return engine
 }
