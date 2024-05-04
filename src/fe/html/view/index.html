@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>share</title>
+  <link rel="icon" href="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+  <style>
+    body {
+      font-family: ui-monospace, monospace, Menlo, Consolas, Hack, Liberation Mono, Microsoft Yahei, Noto Sans Mono CJK SC, sans-serif;
+      line-height: 1.5;
+      margin: 50px auto;
+      padding: 30px 30px 0 30px;
+      width: 80%;
+      max-width: 800px;
+      border: 1px solid #000000;
+      border-radius: 8px;
+    }
+
+    button {
+      font-family: inherit;
+      background-color: #e9e9ed;
+      border: none;
+      border-radius: 2px;
+      padding: 5px 10px;
+      width: 6em;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background-color: #d0d0d7;
+    }
+
+    button:active:enabled {
+      background-color: #b1b1b9;
+    }
+
+    dialog {
+      border-radius: 8px;
+      border-width: 2px;
+    }
+
+    dialog table tr td {
+      padding: 2px 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input id="fileSizeInput" type="hidden" name="fileSize">
+    <input id="fileListInput" type="file" name="fileList" autocomplete="off" style="display:none;" multiple>
+    <button id="fileListButton" type="button">Browse</button>
+    <input id="fileListText" type="text" autocomplete="off" readonly disabled>
+    <button id="uploadButton" type="button">Submit</button>
+  </form>
+  <br />
+  <table id="infoTable" style="width:100%;"></table>
+  <br />
+  <script type="module" src="/static/view.js"></script>
+</body>
+
+</html>
