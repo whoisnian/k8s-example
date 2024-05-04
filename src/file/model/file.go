@@ -10,7 +10,7 @@ type File struct {
 	UserID int64  `gorm:"column:user_id;type:bigint(20);index:files_user_id_idx" json:"user_id"`
 	Name   string `gorm:"column:name;type:varchar(255)" json:"name"`
 	Size   int64  `gorm:"column:size;type:bigint(20)" json:"size"`
-	Digest string `gorm:"column:digest;type:varchar(255);index:files_digest_idx,unique" json:"digest"`
+	Digest string `gorm:"column:digest;type:varchar(255);" json:"digest"`
 
 	BucketName string `gorm:"column:bucket_name;type:varchar(255)" json:"bucket_name"`
 	ObjectName string `gorm:"column:object_name;type:varchar(255)" json:"object_name"`

@@ -1,1 +1,33 @@
 # k8s-example-file
+persistent file storage
+
+## routes
+| method | path             | description   |
+| ------ | ---------------- | ------------- |
+| GET    | /file/objects    | list files    |
+| POST   | /file/objects    | upload files  |
+| GET    | /file/object/:id | download file |
+| DELETE | /file/object/:id | delete file   |
+
+## config
+| env name          | default value                                                                   |
+| ----------------- | ------------------------------------------------------------------------------- |
+| CFG_DEBUG         | false                                                                           |
+| CFG_VERSION       | false                                                                           |
+| CFG_LISTENADDR    | 0.0.0.0:8081                                                                    |
+| CFG_MYSQLDSN      | root:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=UTC |
+| CFG_AUTOMIGRATE   | false                                                                           |
+| CFG_STORAGEDRIVER | filesystem                                                                      |
+| CFG_STORAGEBUCKET | bucket01                                                                        |
+| CFG_ROOTDIRECTORY | ./uploads                                                                       |
+| CFG_S3ENDPOINT    | https://s3.amazonaws.com                                                        |
+| CFG_S3ACCESSKEY   | QZH1XZPZLP8DA3GKA3J1                                                            |
+| CFG_S3SECRETKEY   | VQyou21kIHVuKLkULNaETFnN7kLstyiX2KEtVbuI                                        |
+| CFG_S3SECURE      | true                                                                            |
+
+## start
+```sh
+# pwd: src/file
+CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC" CFG_AUTOMIGRATE=true go run main.go
+CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC" go run main.go
+```
