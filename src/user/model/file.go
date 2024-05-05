@@ -15,7 +15,7 @@ type File struct {
 	BucketName string `gorm:"column:bucket_name;type:varchar(255)" json:"bucket_name"`
 	ObjectName string `gorm:"column:object_name;type:varchar(255)" json:"object_name"`
 
-	DeletedAt sql.NullTime `gorm:"column:deleted_at;type:datetime;default:null" json:"deleted_at"`
+	DeletedAt sql.NullTime `gorm:"column:deleted_at;type:datetime;default:null" json:"-"`
 	CreatedAt time.Time    `gorm:"column:created_at;type:datetime;not null" json:"created_at"`
 	UpdatedAt time.Time    `gorm:"column:updated_at;type:datetime;not null" json:"updated_at"`
 }
