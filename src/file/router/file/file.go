@@ -1,6 +1,8 @@
 package file
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -67,17 +69,19 @@ func CreateHandler(c *gin.Context) {
 			}
 			file.ObjectName = genObjectName(file.ID)
 
+			hasher := sha256.New()
 			var size int64 = -1
 			if len(sizes) > 0 {
 				size = sizes[0]
 				sizes = sizes[1:]
 			}
-			file.Digest, file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, part, size)
+			file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
 			if err != nil {
 				global.LOG.Error("fs create file", zap.Error(err))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "fs err"})
 				return
 			}
+			file.Digest = hex.EncodeToString(hasher.Sum(nil))
 
 			res = global.DB.Save(&file)
 			if res.Error != nil {

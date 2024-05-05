@@ -2,15 +2,16 @@ package s3driver
 
 import (
 	"context"
+	"errors"
 	"io"
+	"io/fs"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 type Driver struct {
-	client      *minio.Client
-	bucketCache map[string]bool
+	client *minio.Client
 }
 
 func New(endpoint, accessKey, secretKey string, secure bool) (*Driver, error) {
@@ -21,23 +22,28 @@ func New(endpoint, accessKey, secretKey string, secure bool) (*Driver, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Driver{
-		client:      client,
-		bucketCache: make(map[string]bool),
-	}, nil
+	return &Driver{client}, nil
 }
 
-func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, size int64) (string, int64, error) {
+func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, size int64) (int64, error) {
+	if !fs.ValidPath(bucket) || !fs.ValidPath(object) {
+		return 0, errors.New("s3driver: invalid bucket/object to resolve")
+	}
+
 	ctx := context.Background()
-	if err := dri.ensureBucketExists(ctx, bucket); err != nil {
-		return "", 0, err
+	if ok, err := dri.client.BucketExists(ctx, bucket); err != nil {
+		return 0, err
+	} else if !ok {
+		if err = dri.client.MakeBucket(ctx, bucket, minio.MakeBucketOptions{}); err != nil {
+			return 0, err
+		}
 	}
 
 	info, err := dri.client.PutObject(ctx, bucket, object, reader, size, minio.PutObjectOptions{})
 	if err != nil {
-		return "", 0, err
+		return 0, err
 	}
-	return info.ChecksumSHA256, info.Size, nil
+	return info.Size, nil
 }
 
 func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {
@@ -46,18 +52,4 @@ func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {
 
 func (dri *Driver) DeleteFile(bucket, object string) error {
 	return dri.client.RemoveObject(context.Background(), bucket, object, minio.RemoveObjectOptions{})
-}
-
-func (dri *Driver) ensureBucketExists(ctx context.Context, bucket string) error {
-	if !dri.bucketCache[bucket] {
-		if ok, err := dri.client.BucketExists(ctx, bucket); err != nil {
-			return err
-		} else if !ok {
-			if err = dri.client.MakeBucket(ctx, bucket, minio.MakeBucketOptions{}); err != nil {
-				return err
-			}
-		}
-		dri.bucketCache[bucket] = true
-	}
-	return nil
 }

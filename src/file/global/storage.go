@@ -11,7 +11,7 @@ import (
 var FS StorageDriver
 
 type StorageDriver interface {
-	CreateFile(bucket, object string, reader io.Reader, size int64) (string, int64, error)
+	CreateFile(bucket, object string, reader io.Reader, size int64) (int64, error)
 	OpenFile(bucket, object string) (io.ReadCloser, error)
 	DeleteFile(bucket, object string) error
 }
