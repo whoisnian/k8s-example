@@ -1,3 +1,6 @@
 go 1.22.2
 
-use ./src/file
+use (
+	./src/file
+	./src/user
+)
