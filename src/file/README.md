@@ -20,7 +20,7 @@ persistent file storage
 | CFG_STORAGEDRIVER | filesystem                                                                      |
 | CFG_STORAGEBUCKET | bucket01                                                                        |
 | CFG_ROOTDIRECTORY | ./uploads                                                                       |
-| CFG_S3ENDPOINT    | https://s3.amazonaws.com                                                        |
+| CFG_S3ENDPOINT    | s3.amazonaws.com                                                                |
 | CFG_S3ACCESSKEY   | QZH1XZPZLP8DA3GKA3J1                                                            |
 | CFG_S3SECRETKEY   | VQyou21kIHVuKLkULNaETFnN7kLstyiX2KEtVbuI                                        |
 | CFG_S3SECURE      | true                                                                            |
@@ -29,5 +29,5 @@ persistent file storage
 ```sh
 # pwd: src/file
 CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC" CFG_AUTOMIGRATE=true go run main.go
-CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC" go run main.go
+CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC" CFG_STORAGEDRIVER=aws-s3 CFG_S3ENDPOINT=127.0.0.1:9000 CFG_S3ACCESSKEY=minio_ekwzx CFG_S3SECRETKEY=LFKwQ7PIUCpqrKMFyZYF CFG_S3SECURE=false go run main.go
 ```
