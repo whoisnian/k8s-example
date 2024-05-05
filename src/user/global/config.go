@@ -14,6 +14,9 @@ type Config struct {
 	ListenAddr  string // server listen addr
 	MysqlDSN    string // mysql dsn from https://github.com/go-sql-driver/mysql/blob/master/README.md#dsn-data-source-name
 	AutoMigrate bool   // automatically migrate mysql schema and quit
+	RedisURI    string // redis uri from https://github.com/redis/redis-specifications/blob/master/uri/redis.txt
+
+	DisableRegistration bool // disable user self-registration
 }
 
 func SetupConfig() {
@@ -34,6 +37,9 @@ func SetupConfig() {
 		CFG.ListenAddr = stringFromEnv("CFG_LISTENADDR", "0.0.0.0:8080")
 		CFG.MysqlDSN = stringFromEnv("CFG_MYSQLDSN", "root:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=UTC")
 		CFG.AutoMigrate = boolFromEnv("CFG_AUTOMIGRATE", false)
+		CFG.RedisURI = stringFromEnv("CFG_REDISURI", "redis://default:password@127.0.0.1:6379/0")
+
+		CFG.DisableRegistration = boolFromEnv("CFG_DISABLEREGISTRATION", false)
 	}
 }
 

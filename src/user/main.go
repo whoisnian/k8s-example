@@ -26,6 +26,8 @@ func main() {
 		return
 	}
 
+	global.SetupRedis()
+	global.LOG.Info("setup redis successfully")
 	global.SetupMySQL()
 	global.LOG.Info("setup mysql successfully")
 
