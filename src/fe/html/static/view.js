@@ -1,23 +1,5 @@
+import { createElement, downloadFile, calcFromBytes, calcRelativeTime, reloadPage } from './function.js'
 import { fetchGetJSON, fetchDeleteHead } from './request.js'
-import { calcFromBytes, calcRelativeTime, reloadPage } from './function.js'
-
-/** @returns { HTMLElement } */
-const createElement = (tag, options = {}) => {
-  const element = document.createElement(tag)
-  Object.entries(options).forEach(([k, v]) => {
-    element.setAttribute(k, v)
-  })
-  return element
-}
-
-const downloadFile = (url, filename) => {
-  const link = createElement('a', {
-    href: url,
-    download: filename
-  })
-  link.click()
-  link.remove()
-}
 
 /** @param {{ id: number, name: string, size: number, created_at: string }} */
 const createFileItem = ({ id, name, size, created_at }) => {
