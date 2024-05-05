@@ -110,6 +110,11 @@ func DownloadHandler(c *gin.Context) {
 		return
 	}
 
+	if file.ObjectName == "" {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"msg": "file is incomplete"})
+		return
+	}
+
 	irc, err := global.FS.OpenFile(file.BucketName, file.ObjectName)
 	if err != nil {
 		global.LOG.Error("fs open file", zap.Error(err))
