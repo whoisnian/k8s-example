@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/gin-gonic/gin v1.9.2-0.20240402105722-c6f90df4e0c8
+	github.com/redis/go-redis/v9 v9.5.1
 	go.opentelemetry.io/otel/trace v1.25.0
 	go.uber.org/zap v1.27.0
 	gorm.io/driver/mysql v1.5.6
@@ -13,8 +14,10 @@ require (
 
 require (
 	github.com/bytedance/sonic v1.11.3 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
