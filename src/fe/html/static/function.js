@@ -1,3 +1,21 @@
+/** @returns { HTMLElement } */
+const createElement = (tag, options = {}) => {
+  const element = document.createElement(tag)
+  Object.entries(options).forEach(([k, v]) => {
+    element.setAttribute(k, v)
+  })
+  return element
+}
+
+const downloadFile = (url, filename) => {
+  const link = createElement('a', {
+    href: url,
+    download: filename
+  })
+  link.click()
+  link.remove()
+}
+
 const calcFromBytes = (raw) => {
   if (typeof raw === 'string') {
     raw = parseInt(raw)
@@ -45,6 +63,8 @@ const openUrl = (url) => { window.location.href = url }
 const openUrlInNewTab = (url) => window.open(url, '_blank')
 
 export {
+  createElement,
+  downloadFile,
   calcFromBytes,
   calcRelativeTime,
   reloadPage,
