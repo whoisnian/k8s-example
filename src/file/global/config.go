@@ -46,7 +46,7 @@ func SetupConfig() {
 		CFG.StorageDriver = stringFromEnv("CFG_STORAGEDRIVER", "filesystem")
 		CFG.StorageBucket = stringFromEnv("CFG_STORAGEBUCKET", "bucket01")
 		CFG.RootDirectory = stringFromEnv("CFG_ROOTDIRECTORY", "./uploads")
-		CFG.S3Endpoint = stringFromEnv("CFG_S3ENDPOINT", "https://s3.amazonaws.com")
+		CFG.S3Endpoint = stringFromEnv("CFG_S3ENDPOINT", "s3.amazonaws.com")
 		CFG.S3AccessKey = stringFromEnv("CFG_S3ACCESSKEY", "QZH1XZPZLP8DA3GKA3J1")
 		CFG.S3SecretKey = stringFromEnv("CFG_S3SECRETKEY", "VQyou21kIHVuKLkULNaETFnN7kLstyiX2KEtVbuI")
 		CFG.S3Secure = boolFromEnv("CFG_S3SECURE", true)
