@@ -3,12 +3,12 @@ services:
     image: minio/minio:RELEASE.2024-05-01T01-11-10Z
     command:
       - server
-      - /mnt/data
+      - /data
       - --address=:9000
       - --console-address=:9001
     restart: always
     volumes:
-      - minio_data:/mnt/data
+      - minio_data:/data
     env_file:
       - path: compose.minio.env
         required: true

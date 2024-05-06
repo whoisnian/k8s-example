@@ -7,5 +7,10 @@ services:
       - --maxmemory-policy
       - allkeys-lru
     restart: always
+    volumes:
+      - redis_data:/data # https://github.com/docker-library/redis/issues/140
     ports:
       - 6379:6379
+
+volumes:
+  redis_data:
