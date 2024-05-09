@@ -28,11 +28,11 @@ persistent file storage
 ## start
 ```sh
 # pwd: src/file
-export CFG_MYSQLDSN="root:PD3lfKSxoXVPCdvriSHv@tcp(127.0.0.1:3306)/db_xfrcw?charset=utf8mb4&parseTime=True&loc=UTC"
+export CFG_MYSQLDSN="root:ChFHZ8Jjo9u6F3RxKbiO@tcp(127.0.0.1:3306)/demodb?charset=utf8mb4&parseTime=True&loc=UTC"
 export CFG_STORAGEDRIVER=aws-s3
 export CFG_S3ENDPOINT=127.0.0.1:9000
-export CFG_S3ACCESSKEY=minio_ekwzx
-export CFG_S3SECRETKEY=LFKwQ7PIUCpqrKMFyZYF
+export CFG_S3ACCESSKEY=DNtNHG02un
+export CFG_S3SECRETKEY=LGoucBTxlsXwhmJ9Q8aS
 export CFG_S3SECURE=false
 
 CFG_AUTOMIGRATE=true go run main.go

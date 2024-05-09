@@ -6,7 +6,9 @@
 * fe
 
 ## deps
+`docker compose --env-file ./deps/compose.main.env --file ./deps/compose.main.yaml up`
 * mysql
+* redis
 * nfs
 * minio
 * jaeger
