@@ -6,6 +6,8 @@ services:
       - 1gb
       - --maxmemory-policy
       - allkeys-lru
+      - --requirepass
+      - ${REDIS_PASSWORD} # https://docs.docker.com/compose/compose-file/12-interpolation/
     restart: always
     volumes:
       - redis_data:/data # https://github.com/docker-library/redis/issues/140
