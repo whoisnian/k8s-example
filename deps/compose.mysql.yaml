@@ -7,9 +7,9 @@ services:
     restart: always
     volumes:
       - mysql_data:/var/lib/mysql
-    env_file:
-      - path: compose.mysql.env
-        required: true
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
       - 3306:3306
 
