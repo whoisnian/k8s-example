@@ -16,6 +16,15 @@ const downloadFile = (url, filename) => {
   link.remove()
 }
 
+const dialogCloser = (dialog) => {
+  return (e) => {
+    if (e.target !== dialog) return
+    const { left, top, height, width } = dialog.getBoundingClientRect()
+    if (e.clientY < top || e.clientY > top + height || e.clientX < left || e.clientX > left + width)
+      dialog.close()
+  }
+}
+
 const calcFromBytes = (raw) => {
   if (typeof raw === 'string') {
     raw = parseInt(raw)
@@ -65,6 +74,7 @@ const openUrlInNewTab = (url) => window.open(url, '_blank')
 export {
   createElement,
   downloadFile,
+  dialogCloser,
   calcFromBytes,
   calcRelativeTime,
   reloadPage,
