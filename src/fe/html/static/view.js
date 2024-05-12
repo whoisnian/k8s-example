@@ -1,5 +1,5 @@
-import { createElement, downloadFile, calcFromBytes, calcRelativeTime, reloadPage } from './function.js'
-import { fetchGetJSON, fetchDeleteHead } from './request.js'
+import { createElement, downloadFile, dialogCloser, calcFromBytes, calcRelativeTime, reloadPage, openUrl } from './function.js'
+import { fetchGetJSON, fetchDeleteHead, fetchGetJSONWithStatus, fetchPostJSONWithStatus } from './request.js'
 
 /** @param {{ id: number, name: string, size: number, created_at: string }} */
 const createFileItem = ({ id, name, size, created_at }) => {
@@ -36,7 +36,6 @@ const createFileItem = ({ id, name, size, created_at }) => {
   return tr
 }
 
-const uploadForm = document.getElementById('uploadForm')
 const fileSizeInput = document.getElementById('fileSizeInput')
 const fileListInput = document.getElementById('fileListInput')
 
@@ -50,13 +49,13 @@ fileListInput.onchange = () => {
   else fileListText.value = `${fileListInput.files.length} files selected`
 }
 
-const uploadButton = document.getElementById('uploadButton')
-uploadButton.onclick = () => {
+const uploadFormButton = document.getElementById('uploadFormButton')
+uploadFormButton.onclick = () => {
   const sizes = []
   for (const f of fileListInput.files) sizes.push(f.size)
   fileSizeInput.value = JSON.stringify(sizes)
 
-  const formData = new FormData(uploadForm)
+  const formData = new FormData(document.getElementById('uploadForm'))
   new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.withCredentials = true
@@ -71,6 +70,41 @@ uploadButton.onclick = () => {
     xhr.open('POST', '/file/objects')
     xhr.send(formData)
   }).then(reloadPage).catch(console.error)
+}
+
+const usernameSpan = document.getElementById('usernameSpan')
+const logoutButton = document.getElementById('logoutButton')
+logoutButton.onclick = () => openUrl('/user/logout')
+
+const signinButton = document.getElementById('signinButton')
+const signinDialog = document.getElementById('signinDialog')
+signinButton.onclick = () => signinDialog.showModal()
+signinDialog.onclick = dialogCloser(signinDialog)
+
+const signinFormButton = document.getElementById('signinFormButton')
+signinFormButton.onclick = async () => {
+  const formData = new FormData(document.getElementById('signinForm'))
+  const { ok } = await fetchPostJSONWithStatus('/user/signin', Object.fromEntries(formData.entries()))
+  if (ok) reloadPage()
+}
+
+const signupButton = document.getElementById('signupButton')
+const signupDialog = document.getElementById('signupDialog')
+signupButton.onclick = () => signupDialog.showModal()
+signupDialog.onclick = dialogCloser(signupDialog)
+
+const signupFormButton = document.getElementById('signupFormButton')
+signupFormButton.onclick = async () => {
+  const formData = new FormData(document.getElementById('signupForm'))
+  const { ok } = await fetchPostJSONWithStatus('/user/signup', Object.fromEntries(formData.entries()))
+  if (ok) reloadPage()
+}
+
+const { ok, content: userInfo } = await fetchGetJSONWithStatus('/user/info')
+if (ok) {
+  usernameSpan.textContent = userInfo.name
+  usernameSpan.style = logoutButton.style = 'display:block;'
+  signinButton.style = signupButton.style = 'display:none;'
 }
 
 const infoTable = document.getElementById('infoTable')

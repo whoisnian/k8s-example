@@ -40,20 +40,50 @@
     button:active:enabled {
       background-color: #b1b1b9;
     }
+
+    dialog {
+      border-radius: 8px;
+      border-width: 2px;
+    }
   </style>
 </head>
 
 <body>
-  <form id="uploadForm" enctype="multipart/form-data">
+  <div style="display:flex;justify-content:flex-end;column-gap:1em;">
+    <span id="usernameSpan" style="display:none;">guest</span>
+    <button id="logoutButton" type="button" style="display:none;">Logout</button>
+    <button id="signinButton" type="button">SignIn</button>
+    <button id="signupButton" type="button">SignUp</button>
+  </div>
+  <br />
+
+  <form id="uploadForm" enctype="multipart/form-data" style="display:flex;justify-content:center;column-gap:1em;">
     <input id="fileSizeInput" type="hidden" name="fileSize">
     <input id="fileListInput" type="file" name="fileList" autocomplete="off" style="display:none;" multiple>
     <button id="fileListButton" type="button">Browse</button>
     <input id="fileListText" type="text" autocomplete="off" readonly disabled>
-    <button id="uploadButton" type="button">Submit</button>
+    <button id="uploadFormButton" type="button">Submit</button>
   </form>
   <br />
+
   <table id="infoTable" style="width:100%;"></table>
   <br />
+
+  <dialog id="signinDialog">
+    <form id="signinForm" style="display:flex;flex-direction:column;align-items:flex-end;row-gap:8px;">
+      <input type="text" name="email" placeholder="email" />
+      <input type="password" name="password" placeholder="password" minlength="8" maxlength="72" />
+      <button id="signinFormButton" type="button">SignIn</button>
+    </form>
+  </dialog>
+  <dialog id="signupDialog">
+    <form id="signupForm" style="display:flex;flex-direction:column;align-items:flex-end;row-gap:8px;">
+      <input type="text" name="name" placeholder="name" />
+      <input type="text" name="email" placeholder="email" />
+      <input type="password" name="password" placeholder="password" minlength="8" maxlength="72" />
+      <button id="signupFormButton" type="button">SignUp</button>
+    </form>
+  </dialog>
   <script type="module" src="/static/view.js"></script>
 </body>
 
