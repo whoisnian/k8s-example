@@ -1,6 +1,6 @@
 services:
   minio:
-    image: minio/minio:RELEASE.2024-05-07T06-41-25Z
+    image: minio/minio:RELEASE.2024-06-28T09-06-49Z
     command:
       - server
       - /data
