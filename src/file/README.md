@@ -34,6 +34,7 @@ export CFG_S3ENDPOINT=127.0.0.1:9000
 export CFG_S3ACCESSKEY=DNtNHG02un
 export CFG_S3SECRETKEY=LGoucBTxlsXwhmJ9Q8aS
 export CFG_S3SECURE=false
+export CFG_EXTERNALSVCUSER="http://127.0.0.1:8080"
 
 CFG_AUTOMIGRATE=true go run main.go
 go run main.go

@@ -22,6 +22,8 @@ type Config struct {
 	S3AccessKey   string // aws-s3: access key id
 	S3SecretKey   string // aws-s3: secret access key
 	S3Secure      bool   // aws-s3: secure transport
+
+	ExternalSvcUser string // external-service: user
 }
 
 func SetupConfig() {
@@ -50,6 +52,7 @@ func SetupConfig() {
 		CFG.S3AccessKey = stringFromEnv("CFG_S3ACCESSKEY", "QZH1XZPZLP8DA3GKA3J1")
 		CFG.S3SecretKey = stringFromEnv("CFG_S3SECRETKEY", "VQyou21kIHVuKLkULNaETFnN7kLstyiX2KEtVbuI")
 		CFG.S3Secure = boolFromEnv("CFG_S3SECURE", true)
+		CFG.ExternalSvcUser = stringFromEnv("CFG_EXTERNALSVCUSER", "http://127.0.0.1:8080")
 	}
 }
 
