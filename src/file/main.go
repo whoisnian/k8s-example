@@ -13,6 +13,7 @@ import (
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
 	"github.com/whoisnian/k8s-example/src/file/router"
+	"github.com/whoisnian/k8s-example/src/file/service/svcuser"
 	"go.uber.org/zap"
 )
 
@@ -36,6 +37,9 @@ func main() {
 		global.LOG.Info("setup auto-migrate successfully")
 		return
 	}
+
+	svcuser.Setup(global.CFG.ExternalSvcUser)
+	global.LOG.Info("setup service successfully")
 
 	server := &http.Server{
 		Addr:              global.CFG.ListenAddr,

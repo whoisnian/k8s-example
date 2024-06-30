@@ -12,14 +12,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
+	"github.com/whoisnian/k8s-example/src/file/service/svcuser"
 	"go.uber.org/zap"
 )
 
-const defaultUserID = 0
-
 func ListHandler(c *gin.Context) {
+	info, err := svcuser.UserInfo(c)
+	if err != nil {
+		global.LOG.Error("svc user info", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		return
+	}
+
 	var files []model.File
-	res := global.DB.Where("user_id = ? AND deleted_at IS NULL", defaultUserID).Order("id desc").Find(&files)
+	res := global.DB.Where("user_id = ? AND deleted_at IS NULL", info.ID).Order("id desc").Find(&files)
 	if res.Error != nil {
 		global.LOG.Error("db find files", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -29,6 +35,13 @@ func ListHandler(c *gin.Context) {
 }
 
 func CreateHandler(c *gin.Context) {
+	info, err := svcuser.UserInfo(c)
+	if err != nil {
+		global.LOG.Error("svc user info", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		return
+	}
+
 	reader, err := c.Request.MultipartReader()
 	if err != nil {
 		global.LOG.Error("get multipart reader", zap.Error(err))
@@ -57,7 +70,7 @@ func CreateHandler(c *gin.Context) {
 		} else if part.FormName() == "fileList" {
 			global.LOG.Debug("multipart", zap.Any("part", part))
 			file := model.File{
-				UserID:     defaultUserID,
+				UserID:     info.ID,
 				Name:       part.FileName(),
 				BucketName: global.CFG.StorageBucket,
 			}
@@ -102,8 +115,15 @@ func DownloadHandler(c *gin.Context) {
 		return
 	}
 
+	info, err := svcuser.UserInfo(c)
+	if err != nil {
+		global.LOG.Error("svc user info", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		return
+	}
+
 	var file model.File
-	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", defaultUserID, id)
+	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
 	if res.Error != nil {
 		global.LOG.Error("db find file", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -134,8 +154,15 @@ func DeleteHandler(c *gin.Context) {
 		return
 	}
 
+	info, err := svcuser.UserInfo(c)
+	if err != nil {
+		global.LOG.Error("svc user info", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		return
+	}
+
 	var file model.File
-	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", defaultUserID, id)
+	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
 	if res.Error != nil {
 		global.LOG.Error("db find file", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
