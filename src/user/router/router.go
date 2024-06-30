@@ -53,6 +53,9 @@ func Setup() *gin.Engine {
 	engine.Handle(http.MethodGet, "/user/logout", user.LogoutHandler)
 	engine.Handle(http.MethodGet, "/user/info", user.InfoHandler)
 
+	// RouterPrefix: /internal/user/
+	engine.Handle(http.MethodGet, "/internal/user/info", user.InternalInfoHandler)
+
 	return engine
 }
 

@@ -144,3 +144,26 @@ func InfoHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+func InternalInfoHandler(c *gin.Context) {
+	// maybe unexpected log format:
+	// https://github.com/gin-contrib/sessions/blob/4814ef52395a0762cd27afc049b3b38e56a28abe/sessions.go#L134
+	id, ok := sessions.Default(c).Get("user_id").(int64)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid cookie"})
+		return
+	}
+
+	var user model.User
+	err := global.DB.First(&user, "id = ? AND deleted_at IS NULL", id).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid user"})
+		return
+	} else if err != nil {
+		global.LOG.Error("db find user", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
