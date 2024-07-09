@@ -1,0 +1,29 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    restart: always
+    volumes:
+      - jaeger_data:/badger
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_KEY=/badger/data/keys
+      - BADGER_DIRECTORY_VALUE=/badger/data/values
+    ports:
+      - 14269:14269 # health check and metrics
+      - 16686:16686 # serve frontend
+      - 4317:4317 # OTLP over gRPC
+      - 4318:4318 # OTLP over HTTP
+    depends_on:
+      prepare-jaeger:
+        condition: service_completed_successfully
+
+  prepare-jaeger: # https://github.com/jaegertracing/jaeger/blob/295293c53c68df4dbc896082a00a5bc3d532cfc9/plugin/storage/badger/docs/storage-file-non-root-permission.md
+    image: jaegertracing/all-in-one:1.58
+    user: root
+    entrypoint: install -o 10001 -g 10001 -m 0700 -d /badger/data
+    volumes:
+      - jaeger_data:/badger
+
+volumes:
+  jaeger_data: 
