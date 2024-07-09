@@ -4,3 +4,4 @@ include:
   - path: compose.minio.yaml
   - path: compose.mysql.yaml
   - path: compose.redis.yaml
+  - path: compose.jaeger.yaml
