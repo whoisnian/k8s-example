@@ -13,6 +13,7 @@ require (
 	go.uber.org/zap v1.27.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.10
+	gorm.io/plugin/opentelemetry v0.1.4
 	moul.io/zapgorm2 v1.3.0
 )
 
@@ -63,5 +64,4 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/plugin/opentelemetry v0.1.4
 )
