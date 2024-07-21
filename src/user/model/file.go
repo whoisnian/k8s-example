@@ -15,11 +15,35 @@ type File struct {
 	BucketName string `gorm:"column:bucket_name;type:varchar(255)" json:"bucket_name"`
 	ObjectName string `gorm:"column:object_name;type:varchar(255)" json:"object_name"`
 
-	DeletedAt sql.NullTime `gorm:"column:deleted_at;type:datetime;default:null" json:"-"`
+	DeletedAt sql.NullTime `gorm:"column:deleted_at;type:datetime;default:null" json:"deleted_at"`
 	CreatedAt time.Time    `gorm:"column:created_at;type:datetime;not null" json:"created_at"`
 	UpdatedAt time.Time    `gorm:"column:updated_at;type:datetime;not null" json:"updated_at"`
 }
 
+type FileJson struct {
+	ID     int64  `json:"id"`
+	UserID int64  `json:"user_id"`
+	Name   string `json:"name"`
+	Size   int64  `json:"size"`
+	Digest string `json:"digest"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 func (*File) TableName() string {
 	return "files"
+}
+
+func (raw *File) AsJson() FileJson {
+	return FileJson{
+		ID:     raw.ID,
+		UserID: raw.UserID,
+		Name:   raw.Name,
+		Size:   raw.Size,
+		Digest: raw.Digest,
+
+		CreatedAt: raw.CreatedAt,
+		UpdatedAt: raw.UpdatedAt,
+	}
 }
