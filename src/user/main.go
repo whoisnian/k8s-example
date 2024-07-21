@@ -26,6 +26,9 @@ func main() {
 		return
 	}
 
+	tracerProvider := global.SetupTracer()
+	global.LOG.Info("setup tracer successfully")
+
 	global.SetupRedis()
 	global.LOG.Info("setup redis successfully")
 	global.SetupMySQL()
@@ -55,9 +58,12 @@ func main() {
 
 	waitFor(syscall.SIGINT, syscall.SIGTERM)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
+		global.LOG.Warn(err.Error())
+	}
+	if err := tracerProvider.Shutdown(ctx); err != nil {
 		global.LOG.Warn(err.Error())
 	}
 	global.LOG.Info("service has been shut down")
