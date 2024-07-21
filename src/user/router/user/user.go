@@ -33,7 +33,7 @@ func SignUpHandler(c *gin.Context) {
 	}
 
 	var exists int64
-	if err := global.DB.Model(&model.User{}).Where("email = ?", params.Email).Select("1").First(&exists).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := global.DB.WithContext(c.Request.Context()).Model(&model.User{}).Where("email = ?", params.Email).Select("1").First(&exists).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "invalid email"})
 		return
 	}
@@ -54,7 +54,7 @@ func SignUpHandler(c *gin.Context) {
 		Email:    params.Email,
 		Password: string(digest),
 	}
-	if err = global.DB.Create(&user).Error; err != nil {
+	if err = global.DB.WithContext(c.Request.Context()).Create(&user).Error; err != nil {
 		global.LOG.Error("db create user", zap.Error(err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
 		return
@@ -77,7 +77,7 @@ func SignInHandler(c *gin.Context) {
 	}
 
 	var user model.User
-	err := global.DB.First(&user, "email = ? AND deleted_at IS NULL", params.Email).Error
+	err := global.DB.WithContext(c.Request.Context()).First(&user, "email = ? AND deleted_at IS NULL", params.Email).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"msg": "email or password err"})
 		return
@@ -132,7 +132,7 @@ func InfoHandler(c *gin.Context) {
 	}
 
 	var user model.User
-	err := global.DB.First(&user, "id = ? AND deleted_at IS NULL", id).Error
+	err := global.DB.WithContext(c.Request.Context()).First(&user, "id = ? AND deleted_at IS NULL", id).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid user"})
 		return
@@ -155,7 +155,7 @@ func InternalInfoHandler(c *gin.Context) {
 	}
 
 	var user model.User
-	err := global.DB.First(&user, "id = ? AND deleted_at IS NULL", id).Error
+	err := global.DB.WithContext(c.Request.Context()).First(&user, "id = ? AND deleted_at IS NULL", id).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid user"})
 		return

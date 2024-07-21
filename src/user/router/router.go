@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/user/global"
 	"github.com/whoisnian/k8s-example/src/user/router/user"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -41,6 +42,7 @@ func Setup() *gin.Engine {
 	}
 
 	engine := gin.New()
+	engine.RouterGroup.Use(otelgin.Middleware("")) // If the primary server name is not known, the default req.Host is used
 	engine.RouterGroup.Use(Logger(global.LOG))
 	engine.RouterGroup.Use(Recovery(global.LOG))
 	engine.RouterGroup.Use(RedisSessions(global.CFG.RedisURI, global.CFG.AppSecret))

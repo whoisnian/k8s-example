@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/opentelemetry/tracing"
 	"moul.io/zapgorm2"
 )
 
@@ -37,6 +38,10 @@ func SetupMySQL() {
 		Logger: gormLogger,
 	})
 	if err != nil {
+		panic(err)
+	}
+
+	if err := DB.Use(tracing.NewPlugin()); err != nil {
 		panic(err)
 	}
 
