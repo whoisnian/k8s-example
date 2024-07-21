@@ -18,6 +18,8 @@ type Config struct {
 	AppSecret   string // session authentication key with 32 bytes
 
 	DisableRegistration bool // disable user self-registration
+
+	TraceEndpointUrl string // OTLP Trace HTTP Exporter endpoint url
 }
 
 func SetupConfig() {
@@ -42,6 +44,8 @@ func SetupConfig() {
 		CFG.AppSecret = stringFromEnv("CFG_APPSECRET", "authentication_key_with_32_bytes")
 
 		CFG.DisableRegistration = boolFromEnv("CFG_DISABLEREGISTRATION", false)
+
+		CFG.TraceEndpointUrl = stringFromEnv("CFG_TRACEENDPOINTURL", "http://127.0.0.1:4318")
 	}
 }
 
