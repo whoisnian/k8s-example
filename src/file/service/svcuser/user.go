@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 var (
@@ -28,6 +30,9 @@ func Setup(endpoint string) {
 }
 
 func UserInfo(c *gin.Context) (*model.User, error) {
+	_, span := global.Tracer.Start(c.Request.Context(), "svcuser.UserInfo")
+	defer span.End()
+
 	u := baseURL.ResolveReference(&url.URL{Path: "/internal/user/info"})
 	req := &http.Request{
 		Method:     http.MethodGet,
@@ -51,10 +56,14 @@ func UserInfo(c *gin.Context) (*model.User, error) {
 
 	user := &model.User{}
 	if resp.StatusCode == http.StatusUnauthorized {
+		span.SetAttributes(attribute.Int64("user_id", user.ID), attribute.Int("status", resp.StatusCode))
 		return user, nil // user.ID == 0 if unauthorized
 	} else if resp.StatusCode != http.StatusOK {
+		span.SetAttributes(attribute.Int64("user_id", -1), attribute.Int("status", resp.StatusCode))
 		return nil, errors.New(resp.Status)
 	} else {
-		return user, json.NewDecoder(resp.Body).Decode(user)
+		err = json.NewDecoder(resp.Body).Decode(user)
+		span.SetAttributes(attribute.Int64("user_id", user.ID), attribute.Int("status", resp.StatusCode))
+		return user, err
 	}
 }
