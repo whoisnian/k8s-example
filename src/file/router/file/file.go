@@ -25,7 +25,7 @@ func ListHandler(c *gin.Context) {
 	}
 
 	var files []model.File
-	res := global.DB.Where("user_id = ? AND deleted_at IS NULL", info.ID).Order("id desc").Find(&files)
+	res := global.DB.WithContext(c.Request.Context()).Where("user_id = ? AND deleted_at IS NULL", info.ID).Order("id desc").Find(&files)
 	if res.Error != nil {
 		global.LOG.Error("db find files", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -74,7 +74,7 @@ func CreateHandler(c *gin.Context) {
 				Name:       part.FileName(),
 				BucketName: global.CFG.StorageBucket,
 			}
-			res := global.DB.Create(&file)
+			res := global.DB.WithContext(c.Request.Context()).Create(&file)
 			if res.Error != nil {
 				global.LOG.Error("db create file", zap.Error(res.Error))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -96,7 +96,7 @@ func CreateHandler(c *gin.Context) {
 			}
 			file.Digest = hex.EncodeToString(hasher.Sum(nil))
 
-			res = global.DB.Save(&file)
+			res = global.DB.WithContext(c.Request.Context()).Save(&file)
 			if res.Error != nil {
 				global.LOG.Error("db update file", zap.Error(res.Error))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -123,7 +123,7 @@ func DownloadHandler(c *gin.Context) {
 	}
 
 	var file model.File
-	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
+	res := global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
 	if res.Error != nil {
 		global.LOG.Error("db find file", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -162,7 +162,7 @@ func DeleteHandler(c *gin.Context) {
 	}
 
 	var file model.File
-	res := global.DB.First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
+	res := global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
 	if res.Error != nil {
 		global.LOG.Error("db find file", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
@@ -170,7 +170,7 @@ func DeleteHandler(c *gin.Context) {
 	}
 
 	file.DeletedAt.Scan(time.Now())
-	res = global.DB.Save(&file)
+	res = global.DB.WithContext(c.Request.Context()).Save(&file)
 	if res.Error != nil {
 		global.LOG.Error("db delete file", zap.Error(res.Error))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
