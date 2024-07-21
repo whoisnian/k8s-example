@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -20,7 +21,8 @@ var (
 
 func Setup(endpoint string) {
 	httpClient = &http.Client{
-		Timeout: time.Second * 5,
+		Timeout:   time.Second * 5,
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 
 	var err error
@@ -30,11 +32,11 @@ func Setup(endpoint string) {
 }
 
 func UserInfo(c *gin.Context) (*model.User, error) {
-	_, span := global.Tracer.Start(c.Request.Context(), "svcuser.UserInfo")
+	ctx, span := global.Tracer.Start(c.Request.Context(), "svcuser.UserInfo")
 	defer span.End()
 
 	u := baseURL.ResolveReference(&url.URL{Path: "/internal/user/info"})
-	req := &http.Request{
+	req := (&http.Request{
 		Method:     http.MethodGet,
 		URL:        u,
 		Proto:      "HTTP/1.1",
@@ -43,7 +45,7 @@ func UserInfo(c *gin.Context) (*model.User, error) {
 		Header:     make(http.Header),
 		Body:       nil,
 		Host:       u.Host,
-	}
+	}).WithContext(ctx)
 	if c.GetHeader("Cookie") != "" {
 		req.Header.Set("Cookie", c.GetHeader("Cookie"))
 	}
