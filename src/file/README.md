@@ -36,8 +36,6 @@ export CFG_S3ENDPOINT=127.0.0.1:9000
 export CFG_S3ACCESSKEY=DNtNHG02un
 export CFG_S3SECRETKEY=LGoucBTxlsXwhmJ9Q8aS
 export CFG_S3SECURE=false
-export CFG_EXTERNALSVCUSER="http://127.0.0.1:8080"
-export CFG_TRACEENDPOINTURL="http://127.0.0.1:4318"
 
 ./build/build.sh . && CFG_AUTOMIGRATE=true ./output/k8s-example-file
 ./build/build.sh . && ./output/k8s-example-file

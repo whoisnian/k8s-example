@@ -17,6 +17,7 @@ user authentication
 | CFG_AUTOMIGRATE         | false                                                                           |
 | CFG_REDISURI            | redis://default:password@127.0.0.1:6379/0                                       |
 | CFG_DISABLEREGISTRATION | false                                                                           |
+| CFG_TRACEENDPOINTURL    | http://127.0.0.1:4318                                                           |
 
 ## start
 ```sh
