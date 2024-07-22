@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/user/global"
 	"github.com/whoisnian/k8s-example/src/user/model"
+	"github.com/whoisnian/k8s-example/src/user/pkg/apis"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,20 +22,25 @@ type SignUpParams struct {
 
 func SignUpHandler(c *gin.Context) {
 	if global.CFG.DisableRegistration {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"msg": "disable registration"})
+		c.AbortWithStatusJSON(http.StatusForbidden, apis.MessageResponse{Message: apis.MsgDisableRegistration})
 		return
 	}
 
 	params := SignUpParams{}
 	if err := c.BindJSON(&params); err != nil {
 		global.LOG.Error("BindJSON SignUpParams", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "invalid params"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
 		return
 	}
 
 	var exists int64
-	if err := global.DB.WithContext(c.Request.Context()).Model(&model.User{}).Where("email = ?", params.Email).Select("1").First(&exists).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "invalid email"})
+	if err := global.DB.WithContext(c.Request.Context()).Model(&model.User{}).Where("email = ?", params.Email).Select("1").Find(&exists).Error; err != nil {
+		global.LOG.Error("db find user", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
+		return
+	}
+	if exists == 1 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidEmail})
 		return
 	}
 
@@ -45,7 +51,7 @@ func SignUpHandler(c *gin.Context) {
 	digest, err := bcrypt.GenerateFromPassword([]byte(params.Password), 12)
 	if err != nil {
 		global.LOG.Error("bcrypt generate", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "encrypt password err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
@@ -56,11 +62,11 @@ func SignUpHandler(c *gin.Context) {
 	}
 	if err = global.DB.WithContext(c.Request.Context()).Create(&user).Error; err != nil {
 		global.LOG.Error("db create user", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.AsJson())
 }
 
 type SignInParams struct {
@@ -72,28 +78,28 @@ func SignInHandler(c *gin.Context) {
 	params := SignInParams{}
 	if err := c.BindJSON(&params); err != nil {
 		global.LOG.Error("BindJSON SignInParams", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "invalid params"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
 		return
 	}
 
 	var user model.User
 	err := global.DB.WithContext(c.Request.Context()).First(&user, "email = ? AND deleted_at IS NULL", params.Email).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"msg": "email or password err"})
+		c.AbortWithStatusJSON(http.StatusForbidden, apis.MessageResponse{Message: apis.MsgEmailOrPasswordError})
 		return
 	} else if err != nil {
 		global.LOG.Error("db find user", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(params.Password))
 	if err != nil && errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"msg": "email or password err"})
+		c.AbortWithStatusJSON(http.StatusForbidden, apis.MessageResponse{Message: apis.MsgEmailOrPasswordError})
 		return
 	} else if err != nil {
 		global.LOG.Error("compare password", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "compare password err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
@@ -101,11 +107,11 @@ func SignInHandler(c *gin.Context) {
 	session.Set("user_id", user.ID)
 	if err = session.Save(); err != nil {
 		global.LOG.Error("save session", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "session err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.AsJson())
 }
 
 func LogoutHandler(c *gin.Context) {
@@ -127,22 +133,22 @@ func InfoHandler(c *gin.Context) {
 	// https://github.com/gin-contrib/sessions/blob/4814ef52395a0762cd27afc049b3b38e56a28abe/sessions.go#L134
 	id, ok := sessions.Default(c).Get("user_id").(int64)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid cookie"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, apis.MessageResponse{Message: apis.MsgInvalidCookie})
 		return
 	}
 
 	var user model.User
 	err := global.DB.WithContext(c.Request.Context()).First(&user, "id = ? AND deleted_at IS NULL", id).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid user"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, apis.MessageResponse{Message: apis.MsgInvalidCookie})
 		return
 	} else if err != nil {
 		global.LOG.Error("db find user", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, user.AsJson())
 }
 
 func InternalInfoHandler(c *gin.Context) {
@@ -150,20 +156,20 @@ func InternalInfoHandler(c *gin.Context) {
 	// https://github.com/gin-contrib/sessions/blob/4814ef52395a0762cd27afc049b3b38e56a28abe/sessions.go#L134
 	id, ok := sessions.Default(c).Get("user_id").(int64)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid cookie"})
+		c.JSON(http.StatusOK, apis.NewInternalResponse[*model.User](apis.CodeInvalidCookie, apis.MsgInvalidCookie, nil))
 		return
 	}
 
 	var user model.User
 	err := global.DB.WithContext(c.Request.Context()).First(&user, "id = ? AND deleted_at IS NULL", id).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"msg": "invalid user"})
+		c.JSON(http.StatusOK, apis.NewInternalResponse[*model.User](apis.CodeInvalidCookie, apis.MsgInvalidCookie, nil))
 		return
 	} else if err != nil {
 		global.LOG.Error("db find user", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.NewInternalResponse[*model.User](apis.CodeInternalError, apis.MsgInternalError, nil))
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, apis.NewInternalResponse(apis.CodeSuccess, apis.MsgSuccess, &user))
 }
