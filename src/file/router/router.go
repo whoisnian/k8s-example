@@ -47,8 +47,8 @@ func Setup() *gin.Engine {
 	// RouterPrefix: /file/
 	engine.Handle(http.MethodGet, "/file/objects", file.ListHandler)
 	engine.Handle(http.MethodPost, "/file/objects", file.CreateHandler)
-	engine.Handle(http.MethodGet, "/file/object/:id", file.DownloadHandler)
-	engine.Handle(http.MethodDelete, "/file/object/:id", file.DeleteHandler)
+	engine.Handle(http.MethodGet, "/file/objects/:id", file.DownloadHandler)
+	engine.Handle(http.MethodDelete, "/file/objects/:id", file.DeleteHandler)
 
 	return engine
 }

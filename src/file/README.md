@@ -2,12 +2,12 @@
 persistent file storage
 
 ## routes
-| method | path             | description   |
-| ------ | ---------------- | ------------- |
-| GET    | /file/objects    | list files    |
-| POST   | /file/objects    | upload files  |
-| GET    | /file/object/:id | download file |
-| DELETE | /file/object/:id | delete file   |
+| method | path              | description   |
+| ------ | ----------------- | ------------- |
+| GET    | /file/objects     | list files    |
+| POST   | /file/objects     | upload files  |
+| GET    | /file/objects/:id | download file |
+| DELETE | /file/objects/:id | delete file   |
 
 ## config
 | env name             | default value                                                                   |

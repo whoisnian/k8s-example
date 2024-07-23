@@ -18,11 +18,11 @@ const createFileItem = ({ id, name, size, created_at }) => {
   const actionTd = createElement('td', { style: "text-align:right;" })
   const downBtn = createElement('button')
   downBtn.textContent = "SAVE"
-  downBtn.onclick = () => downloadFile(`/file/object/${id}`, name)
+  downBtn.onclick = () => downloadFile(`/file/objects/${id}`, name)
   const delBtn = createElement('button')
   delBtn.textContent = "DEL"
   delBtn.onclick = async () => {
-    await fetchDeleteHead(`/file/object/${id}`)
+    await fetchDeleteHead(`/file/objects/${id}`)
     tr.remove()
   }
   actionTd.appendChild(downBtn)
