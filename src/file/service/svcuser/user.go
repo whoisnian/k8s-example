@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
+	"github.com/whoisnian/k8s-example/src/file/pkg/apis"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/attribute"
 )
 
 var (
@@ -55,17 +55,15 @@ func UserInfo(c *gin.Context) (*model.User, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	user := &model.User{}
-	if resp.StatusCode == http.StatusUnauthorized {
-		span.SetAttributes(attribute.Int64("user_id", user.ID), attribute.Int("status", resp.StatusCode))
-		return user, nil // user.ID == 0 if unauthorized
-	} else if resp.StatusCode != http.StatusOK {
-		span.SetAttributes(attribute.Int64("user_id", -1), attribute.Int("status", resp.StatusCode))
+	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New(resp.Status)
-	} else {
-		err = json.NewDecoder(resp.Body).Decode(user)
-		span.SetAttributes(attribute.Int64("user_id", user.ID), attribute.Int("status", resp.StatusCode))
-		return user, err
 	}
+
+	v := &apis.InternalResponse[*model.User]{}
+	if err = json.NewDecoder(resp.Body).Decode(v); err != nil {
+		return nil, err
+	} else if v.Code != apis.CodeSuccess {
+		return &model.User{}, nil // with ID(0)
+	}
+	return v.Data, nil
 }
