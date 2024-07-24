@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -12,40 +13,46 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
 	"github.com/whoisnian/k8s-example/src/file/model"
+	"github.com/whoisnian/k8s-example/src/file/pkg/apis"
 	"github.com/whoisnian/k8s-example/src/file/service/svcuser"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 func ListHandler(c *gin.Context) {
-	info, err := svcuser.UserInfo(c)
+	user, err := svcuser.UserInfo(c)
 	if err != nil {
 		global.LOG.Error("svc user info", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	var files []model.File
-	res := global.DB.WithContext(c.Request.Context()).Where("user_id = ? AND deleted_at IS NULL", info.ID).Order("id desc").Find(&files)
-	if res.Error != nil {
-		global.LOG.Error("db find files", zap.Error(res.Error))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+	err = global.DB.WithContext(c.Request.Context()).Where("user_id = ? AND deleted_at IS NULL", user.ID).Order("id desc").Find(&files).Error
+	if err != nil {
+		global.LOG.Error("db find files", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
-	c.JSON(http.StatusOK, files)
+	results := make([]model.FileJson, len(files))
+	for i := range files {
+		results[i] = files[i].AsJson()
+	}
+	c.JSON(http.StatusOK, results)
 }
 
 func CreateHandler(c *gin.Context) {
-	info, err := svcuser.UserInfo(c)
+	user, err := svcuser.UserInfo(c)
 	if err != nil {
 		global.LOG.Error("svc user info", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	reader, err := c.Request.MultipartReader()
 	if err != nil {
 		global.LOG.Error("get multipart reader", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": "get multipart reader err"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgMultipartReaderError})
 		return
 	}
 	for {
@@ -54,8 +61,8 @@ func CreateHandler(c *gin.Context) {
 			break
 		}
 		if err != nil {
-			global.LOG.Error("read multipart reader", zap.Error(err))
-			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"msg": "read multipart reader err"})
+			global.LOG.Error("read multipart reader part", zap.Error(err))
+			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, apis.MessageResponse{Message: apis.MsgMultipartReaderError})
 			return
 		}
 
@@ -63,21 +70,21 @@ func CreateHandler(c *gin.Context) {
 		if part.FormName() == "fileSize" {
 			err = json.NewDecoder(part).Decode(&sizes)
 			if err != nil {
-				global.LOG.Error("read multipart reader", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "read multipart reader err"})
+				global.LOG.Error("read multipart reader fileSize", zap.Error(err))
+				c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
 				return
 			}
 		} else if part.FormName() == "fileList" {
 			global.LOG.Debug("multipart", zap.Any("part", part))
 			file := model.File{
-				UserID:     info.ID,
+				UserID:     user.ID,
 				Name:       part.FileName(),
 				BucketName: global.CFG.StorageBucket,
 			}
-			res := global.DB.WithContext(c.Request.Context()).Create(&file)
-			if res.Error != nil {
-				global.LOG.Error("db create file", zap.Error(res.Error))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+			err = global.DB.WithContext(c.Request.Context()).Create(&file).Error
+			if err != nil {
+				global.LOG.Error("db create file", zap.Error(err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 				return
 			}
 			file.ObjectName = genObjectName(file.ID)
@@ -91,54 +98,56 @@ func CreateHandler(c *gin.Context) {
 			file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
 			if err != nil {
 				global.LOG.Error("fs create file", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "fs err"})
+				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 				return
 			}
 			file.Digest = hex.EncodeToString(hasher.Sum(nil))
 
-			res = global.DB.WithContext(c.Request.Context()).Save(&file)
-			if res.Error != nil {
-				global.LOG.Error("db update file", zap.Error(res.Error))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+			err = global.DB.WithContext(c.Request.Context()).Save(&file).Error
+			if err != nil {
+				global.LOG.Error("db update file", zap.Error(err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 				return
 			}
 		}
 	}
-	c.JSON(http.StatusOK, gin.H{"msg": "ok"})
+	c.JSON(http.StatusOK, apis.MessageResponse{Message: apis.MsgSuccess})
 }
 
 func DownloadHandler(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
 		return
 	}
 
-	info, err := svcuser.UserInfo(c)
+	user, err := svcuser.UserInfo(c)
 	if err != nil {
 		global.LOG.Error("svc user info", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	var file model.File
-	res := global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
-	if res.Error != nil {
-		global.LOG.Error("db find file", zap.Error(res.Error))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+	err = global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", user.ID, id).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AbortWithStatusJSON(http.StatusNotFound, apis.MessageResponse{Message: apis.MsgFileNotFound})
+		return
+	} else if err != nil {
+		global.LOG.Error("db find file", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
-
 	if file.ObjectName == "" {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{"msg": "file is incomplete"})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, apis.MessageResponse{Message: apis.MsgFileIncomplete})
 		return
 	}
 
 	irc, err := global.FS.OpenFile(file.BucketName, file.ObjectName)
 	if err != nil {
 		global.LOG.Error("fs open file", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "fs err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 	defer irc.Close()
@@ -150,33 +159,36 @@ func DeleteHandler(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.ParseInt(idParam, 10, 64)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"msg": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
 		return
 	}
 
-	info, err := svcuser.UserInfo(c)
+	user, err := svcuser.UserInfo(c)
 	if err != nil {
 		global.LOG.Error("svc user info", zap.Error(err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "svc err"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	var file model.File
-	res := global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", info.ID, id)
-	if res.Error != nil {
-		global.LOG.Error("db find file", zap.Error(res.Error))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+	err = global.DB.WithContext(c.Request.Context()).First(&file, "user_id = ? AND id = ? AND deleted_at IS NULL", user.ID, id).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusOK, apis.MessageResponse{Message: apis.MsgSuccess})
+		return
+	} else if err != nil {
+		global.LOG.Error("db find file", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
 
 	file.DeletedAt.Scan(time.Now())
-	res = global.DB.WithContext(c.Request.Context()).Save(&file)
-	if res.Error != nil {
-		global.LOG.Error("db delete file", zap.Error(res.Error))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"msg": "db err"})
+	err = global.DB.WithContext(c.Request.Context()).Save(&file).Error
+	if err != nil {
+		global.LOG.Error("db delete file", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"msg": "ok"})
+	c.JSON(http.StatusOK, apis.MessageResponse{Message: apis.MsgSuccess})
 }
 
 func genObjectName(id int64) string {
