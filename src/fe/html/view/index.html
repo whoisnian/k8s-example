@@ -58,11 +58,10 @@
   <br />
 
   <form id="uploadForm" enctype="multipart/form-data" style="display:flex;justify-content:center;column-gap:1em;">
-    <input id="fileSizeInput" type="hidden" name="fileSize">
-    <input id="fileListInput" type="file" name="fileList" autocomplete="off" style="display:none;" multiple>
+    <input id="fileListInput" type="file" autocomplete="off" style="display:none;" multiple>
     <button id="fileListButton" type="button">Browse</button>
     <input id="fileListText" type="text" autocomplete="off" readonly disabled>
-    <button id="uploadFormButton" type="button">Submit</button>
+    <button id="uploadFormButton" type="submit">Submit</button>
   </form>
   <br />
 
@@ -73,7 +72,7 @@
     <form id="signinForm" style="display:flex;flex-direction:column;align-items:flex-end;row-gap:8px;">
       <input type="text" name="email" placeholder="email" />
       <input type="password" name="password" placeholder="password" minlength="8" maxlength="72" />
-      <button id="signinFormButton" type="button">SignIn</button>
+      <button id="signinFormButton" type="submit">SignIn</button>
     </form>
   </dialog>
   <dialog id="signupDialog">
@@ -81,7 +80,7 @@
       <input type="text" name="name" placeholder="name" />
       <input type="text" name="email" placeholder="email" />
       <input type="password" name="password" placeholder="password" minlength="8" maxlength="72" />
-      <button id="signupFormButton" type="button">SignUp</button>
+      <button id="signupFormButton" type="submit">SignUp</button>
     </form>
   </dialog>
   <script type="module" src="/static/view.js"></script>
