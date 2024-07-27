@@ -55,6 +55,27 @@ func CreateHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgMultipartReaderError})
 		return
 	}
+
+	// https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#multipart-form-data
+	// The order of parts must be the same as the order of fields in entry list.
+	part, err := reader.NextPart()
+	if err != nil {
+		global.LOG.Error("read multipart reader part", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, apis.MessageResponse{Message: apis.MsgMultipartReaderError})
+		return
+	} else if part.FormName() != "fileSize" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
+		return
+	}
+
+	var sizes []int64
+	err = json.NewDecoder(part).Decode(&sizes)
+	if err != nil {
+		global.LOG.Error("read multipart reader fileSize", zap.Error(err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
+		return
+	}
+
 	for {
 		part, err := reader.NextPart()
 		if err == io.EOF {
@@ -64,51 +85,45 @@ func CreateHandler(c *gin.Context) {
 			global.LOG.Error("read multipart reader part", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, apis.MessageResponse{Message: apis.MsgMultipartReaderError})
 			return
+		} else if part.FormName() != "fileList" {
+			c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
+			return
 		}
 
-		var sizes []int64
-		if part.FormName() == "fileSize" {
-			err = json.NewDecoder(part).Decode(&sizes)
-			if err != nil {
-				global.LOG.Error("read multipart reader fileSize", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusBadRequest, apis.MessageResponse{Message: apis.MsgInvalidParams})
-				return
-			}
-		} else if part.FormName() == "fileList" {
-			global.LOG.Debug("multipart", zap.Any("part", part))
-			file := model.File{
-				UserID:     user.ID,
-				Name:       part.FileName(),
-				BucketName: global.CFG.StorageBucket,
-			}
-			err = global.DB.WithContext(c.Request.Context()).Create(&file).Error
-			if err != nil {
-				global.LOG.Error("db create file", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
-				return
-			}
-			file.ObjectName = genObjectName(file.ID)
+		global.LOG.Debug("multipart read", zap.Any("part", part))
+		file := model.File{
+			UserID:     -1,
+			Name:       part.FileName(),
+			BucketName: global.CFG.StorageBucket,
+		}
+		err = global.DB.WithContext(c.Request.Context()).Create(&file).Error
+		if err != nil {
+			global.LOG.Error("db create file", zap.Error(err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
+			return
+		}
+		file.UserID = user.ID
+		file.ObjectName = genObjectName(file.ID)
 
-			hasher := sha256.New()
-			var size int64 = -1
-			if len(sizes) > 0 {
-				size = sizes[0]
-				sizes = sizes[1:]
-			}
-			file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
-			if err != nil {
-				global.LOG.Error("fs create file", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
-				return
-			}
-			file.Digest = hex.EncodeToString(hasher.Sum(nil))
+		hasher := sha256.New()
+		var size int64 = -1
+		if len(sizes) > 0 {
+			size = sizes[0]
+			sizes = sizes[1:]
+		}
+		file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
+		if err != nil {
+			global.LOG.Error("fs create file", zap.Error(err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
+			return
+		}
+		file.Digest = hex.EncodeToString(hasher.Sum(nil))
 
-			err = global.DB.WithContext(c.Request.Context()).Save(&file).Error
-			if err != nil {
-				global.LOG.Error("db update file", zap.Error(err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
-				return
-			}
+		err = global.DB.WithContext(c.Request.Context()).Save(&file).Error
+		if err != nil {
+			global.LOG.Error("db update file", zap.Error(err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
+			return
 		}
 	}
 	c.JSON(http.StatusOK, apis.MessageResponse{Message: apis.MsgSuccess})
