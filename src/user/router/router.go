@@ -5,15 +5,12 @@ import (
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"os"
 	"runtime/debug"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/user/global"
 	"github.com/whoisnian/k8s-example/src/user/router/user"
@@ -45,7 +42,7 @@ func Setup() *gin.Engine {
 	engine.RouterGroup.Use(otelgin.Middleware("")) // If the primary server name is not known, the default req.Host is used
 	engine.RouterGroup.Use(Logger(global.LOG))
 	engine.RouterGroup.Use(Recovery(global.LOG))
-	engine.RouterGroup.Use(RedisSessions(global.CFG.RedisURI, global.CFG.AppSecret))
+	engine.RouterGroup.Use(sessions.Sessions("_app_session", global.RSS))
 	engine.NoRoute()
 	engine.NoMethod()
 
@@ -146,27 +143,4 @@ func Recovery(logger *zap.Logger) gin.HandlerFunc {
 		}()
 		c.Next()
 	}
-}
-
-func RedisSessions(redisURL, secretKey string) gin.HandlerFunc {
-	u, err := url.Parse(redisURL)
-	if err != nil {
-		panic(err)
-	}
-
-	pass, _ := u.User.Password()
-	dbnum := "0"
-	if len(u.Path) > 0 {
-		part := strings.TrimPrefix(u.Path, "/")
-		if _, err = strconv.Atoi(part); err != nil {
-			panic(err)
-		}
-		dbnum = part
-	}
-
-	store, err := redis.NewStoreWithDB(10, "tcp", u.Host, pass, dbnum, []byte(secretKey))
-	if err != nil {
-		panic(err)
-	}
-	return sessions.Sessions("_app_session", store)
 }
