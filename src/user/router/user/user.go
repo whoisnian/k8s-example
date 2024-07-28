@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -118,6 +119,12 @@ func LogoutHandler(c *gin.Context) {
 	next := c.Query("next")
 	if next == "" {
 		next = "/"
+	} else if u, err := url.Parse(next); err != nil {
+		next = "/"
+		global.LOG.Warn("logout parse next", zap.Error(err))
+	} else if u.Scheme != "" || u.Host != "" {
+		next = "/"
+		global.LOG.Warn("logout open-redirect detected", zap.String("nextScheme", u.Scheme), zap.String("nextHost", u.Host))
 	}
 
 	session := sessions.Default(c)
