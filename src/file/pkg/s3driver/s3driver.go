@@ -8,10 +8,14 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Driver struct {
 	client *minio.Client
+	tracer trace.Tracer
 }
 
 func New(endpoint, accessKey, secretKey string, secure bool) (*Driver, error) {
@@ -22,34 +26,62 @@ func New(endpoint, accessKey, secretKey string, secure bool) (*Driver, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Driver{client}, nil
+	return &Driver{client: client}, nil
 }
 
-func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, size int64) (int64, error) {
+func (dri *Driver) SetupTracing() {
+	if dri.tracer == nil {
+		dri.tracer = otel.GetTracerProvider().Tracer("github.com/whoisnian/k8s-example/src/file/pkg/s3driver")
+	}
+}
+
+func (dri *Driver) CreateFile(ctx context.Context, bucket, object string, reader io.Reader, size int64) (int64, error) {
+	ctx, span := dri.tracer.Start(ctx, "storage.CreateFile")
+	defer span.End()
+
+	info, err := dri.createFile(ctx, bucket, object, reader, size)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return info.Size, err
+}
+
+func (dri *Driver) createFile(ctx context.Context, bucket, object string, reader io.Reader, size int64) (info minio.UploadInfo, err error) {
 	if !fs.ValidPath(bucket) || !fs.ValidPath(object) {
-		return 0, errors.New("s3driver: invalid bucket/object to resolve")
+		return info, errors.New("s3driver: invalid bucket/object to resolve")
 	}
 
-	ctx := context.Background()
 	if ok, err := dri.client.BucketExists(ctx, bucket); err != nil {
-		return 0, err
+		return info, err
 	} else if !ok {
 		if err = dri.client.MakeBucket(ctx, bucket, minio.MakeBucketOptions{}); err != nil {
-			return 0, err
+			return info, err
 		}
 	}
+	return dri.client.PutObject(ctx, bucket, object, reader, size, minio.PutObjectOptions{})
+}
 
-	info, err := dri.client.PutObject(ctx, bucket, object, reader, size, minio.PutObjectOptions{})
+func (dri *Driver) OpenFile(ctx context.Context, bucket, object string) (io.ReadCloser, error) {
+	ctx, span := dri.tracer.Start(ctx, "storage.OpenFile")
+	defer span.End()
+
+	obj, err := dri.client.GetObject(ctx, bucket, object, minio.GetObjectOptions{})
 	if err != nil {
-		return 0, err
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 	}
-	return info.Size, nil
+	return obj, err
 }
 
-func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {
-	return dri.client.GetObject(context.Background(), bucket, object, minio.GetObjectOptions{})
-}
+func (dri *Driver) DeleteFile(ctx context.Context, bucket, object string) error {
+	ctx, span := dri.tracer.Start(ctx, "storage.DeleteFile")
+	defer span.End()
 
-func (dri *Driver) DeleteFile(bucket, object string) error {
-	return dri.client.RemoveObject(context.Background(), bucket, object, minio.RemoveObjectOptions{})
+	err := dri.client.RemoveObject(ctx, bucket, object, minio.RemoveObjectOptions{})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return err
 }
