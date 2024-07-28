@@ -111,7 +111,7 @@ func CreateHandler(c *gin.Context) {
 			size = sizes[0]
 			sizes = sizes[1:]
 		}
-		file.Size, err = global.FS.CreateFile(file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
+		file.Size, err = global.FS.CreateFile(c.Request.Context(), file.BucketName, file.ObjectName, io.TeeReader(part, hasher), size)
 		if err != nil {
 			global.LOG.Error("fs create file", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})
@@ -159,7 +159,7 @@ func DownloadHandler(c *gin.Context) {
 		return
 	}
 
-	irc, err := global.FS.OpenFile(file.BucketName, file.ObjectName)
+	irc, err := global.FS.OpenFile(c.Request.Context(), file.BucketName, file.ObjectName)
 	if err != nil {
 		global.LOG.Error("fs open file", zap.Error(err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, apis.MessageResponse{Message: apis.MsgInternalError})

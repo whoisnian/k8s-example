@@ -1,6 +1,7 @@
 package global
 
 import (
+	"context"
 	"errors"
 	"io"
 
@@ -11,9 +12,11 @@ import (
 var FS StorageDriver
 
 type StorageDriver interface {
-	CreateFile(bucket, object string, reader io.Reader, size int64) (int64, error)
-	OpenFile(bucket, object string) (io.ReadCloser, error)
-	DeleteFile(bucket, object string) error
+	SetupTracing()
+
+	CreateFile(ctx context.Context, bucket, object string, reader io.Reader, size int64) (int64, error)
+	OpenFile(ctx context.Context, bucket, object string) (io.ReadCloser, error)
+	DeleteFile(ctx context.Context, bucket, object string) error
 }
 
 func SetupStorage() {
@@ -28,4 +31,5 @@ func SetupStorage() {
 	if err != nil {
 		panic(err)
 	}
+	FS.SetupTracing()
 }

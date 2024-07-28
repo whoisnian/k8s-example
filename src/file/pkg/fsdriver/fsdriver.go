@@ -1,15 +1,21 @@
 package fsdriver
 
 import (
+	"context"
 	"errors"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Driver struct {
-	root string
+	root   string
+	tracer trace.Tracer
 }
 
 func New(root string) (*Driver, error) {
@@ -21,10 +27,28 @@ func New(root string) (*Driver, error) {
 	} else if !info.IsDir() {
 		return nil, errors.New("fsdriver: root is not a directory")
 	}
-	return &Driver{root}, nil
+	return &Driver{root: root}, nil
 }
 
-func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, _ int64) (int64, error) {
+func (dri *Driver) SetupTracing() {
+	if dri.tracer == nil {
+		dri.tracer = otel.GetTracerProvider().Tracer("github.com/whoisnian/k8s-example/src/file/pkg/fsdriver")
+	}
+}
+
+func (dri *Driver) CreateFile(ctx context.Context, bucket, object string, reader io.Reader, _ int64) (int64, error) {
+	ctx, span := dri.tracer.Start(ctx, "storage.CreateFile")
+	defer span.End()
+
+	written, err := dri.createFile(ctx, bucket, object, reader)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return written, err
+}
+
+func (dri *Driver) createFile(_ context.Context, bucket, object string, reader io.Reader) (int64, error) {
 	name, err := dri.resolve(bucket, object)
 	if err != nil {
 		return 0, err
@@ -50,7 +74,19 @@ func (dri *Driver) CreateFile(bucket, object string, reader io.Reader, _ int64) 
 	return io.Copy(file, reader)
 }
 
-func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {
+func (dri *Driver) OpenFile(ctx context.Context, bucket, object string) (io.ReadCloser, error) {
+	ctx, span := dri.tracer.Start(ctx, "storage.OpenFile")
+	defer span.End()
+
+	fi, err := dri.openFile(ctx, bucket, object)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return fi, err
+}
+
+func (dri *Driver) openFile(_ context.Context, bucket, object string) (*os.File, error) {
 	name, err := dri.resolve(bucket, object)
 	if err != nil {
 		return nil, err
@@ -58,7 +94,19 @@ func (dri *Driver) OpenFile(bucket, object string) (io.ReadCloser, error) {
 	return os.Open(name)
 }
 
-func (dri *Driver) DeleteFile(bucket, object string) error {
+func (dri *Driver) DeleteFile(ctx context.Context, bucket, object string) error {
+	ctx, span := dri.tracer.Start(ctx, "storage.DeleteFile")
+	defer span.End()
+
+	err := dri.deleteFile(ctx, bucket, object)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return err
+}
+
+func (dri *Driver) deleteFile(_ context.Context, bucket, object string) error {
 	name, err := dri.resolve(bucket, object)
 	if err != nil {
 		return err
