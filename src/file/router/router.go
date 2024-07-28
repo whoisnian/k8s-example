@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/whoisnian/k8s-example/src/file/global"
+	"github.com/whoisnian/k8s-example/src/file/pkg/apis"
 	"github.com/whoisnian/k8s-example/src/file/router/file"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel/trace"
@@ -37,6 +38,7 @@ func Setup() *gin.Engine {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
+	apis.SetupTracing()
 	engine := gin.New()
 	engine.RouterGroup.Use(otelgin.Middleware("")) // If the primary server name is not known, the default req.Host is used
 	engine.RouterGroup.Use(Logger(global.LOG))
