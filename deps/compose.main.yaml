@@ -5,3 +5,4 @@ include:
   - path: compose.mysql.yaml
   - path: compose.redis.yaml
   - path: compose.jaeger.yaml
+  - path: compose.efk.yaml
