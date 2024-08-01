@@ -23,7 +23,7 @@ services:
       timeout: 10s
       retries: 120
 
-  prepare-kibana: # https://github.com/elastic/elasticsearch/blob/1fad3347b7077c5bcf534b5c5332ad2c92e9f875/docs/reference/setup/install/docker/docker-compose.yml
+  prepare-kibana: # https://github.com/elastic/elasticsearch/blob/d55f984299e0e88dee72ebd8255f7ff130859ad0/docs/reference/setup/install/docker/docker-compose.yml
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
     user: root
     volumes:

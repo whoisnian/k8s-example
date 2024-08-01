@@ -1,6 +1,6 @@
 services:
   redis:
-    image: redis:7.2
+    image: redis:7.2.5
     command:
       - --maxmemory
       - 1gb
@@ -10,9 +10,18 @@ services:
       - ${REDIS_PASSWORD} # https://docs.docker.com/compose/compose-file/12-interpolation/
     restart: always
     volumes:
-      - redis_data:/data # https://github.com/docker-library/redis/issues/140
+      - redis_data:/data # https://github.com/redis/docker-library-redis/issues/140
     ports:
       - 6379:6379
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "redis-cli -a '${REDIS_PASSWORD}' ping", # https://github.com/redis/docker-library-redis/issues/91
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   redis_data:
