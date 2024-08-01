@@ -1,6 +1,6 @@
 services:
   jaeger:
-    image: jaegertracing/all-in-one:1.58
+    image: jaegertracing/all-in-one:1.59
     restart: always
     volumes:
       - jaeger_data:/badger
@@ -9,21 +9,30 @@ services:
       - BADGER_EPHEMERAL=false
       - BADGER_DIRECTORY_KEY=/badger/data/keys
       - BADGER_DIRECTORY_VALUE=/badger/data/values
-    ports:
+    ports: # https://www.jaegertracing.io/docs/1.59/deployment/
       - 14269:14269 # health check and metrics
       - 16686:16686 # serve frontend
       - 4317:4317 # OTLP over gRPC
       - 4318:4318 # OTLP over HTTP
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/go/bin/all-in-one-linux status", # https://github.com/jaegertracing/jaeger/blob/8c9f6c6df758d647f1cdb8b123b34a5743eaf87d/cmd/internal/status/command.go
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     depends_on:
       prepare-jaeger:
         condition: service_completed_successfully
 
-  prepare-jaeger: # https://github.com/jaegertracing/jaeger/blob/295293c53c68df4dbc896082a00a5bc3d532cfc9/plugin/storage/badger/docs/storage-file-non-root-permission.md
-    image: jaegertracing/all-in-one:1.58
+  prepare-jaeger: # https://github.com/jaegertracing/jaeger/blob/8c9f6c6df758d647f1cdb8b123b34a5743eaf87d/plugin/storage/badger/docs/storage-file-non-root-permission.md
+    image: jaegertracing/all-in-one:1.59
     user: root
-    entrypoint: install -o 10001 -g 10001 -m 0700 -d /badger/data
+    entrypoint: sh -c "test -d /badger/data || install -o 10001 -g 10001 -m 0700 -d /badger/data"
     volumes:
       - jaeger_data:/badger
 
 volumes:
-  jaeger_data: 
+  jaeger_data:

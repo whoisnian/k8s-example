@@ -1,6 +1,6 @@
 services:
   minio:
-    image: minio/minio:RELEASE.2024-06-28T09-06-49Z
+    image: minio/minio:RELEASE.2024-07-31T05-46-26Z
     command:
       - server
       - /data
@@ -16,6 +16,15 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mc ready local", # https://github.com/minio/minio/blob/a9dc061d847277e30c5c6918d6de6f0606f9d285/docs/orchestration/docker-compose/docker-compose.yaml
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   minio_data:
