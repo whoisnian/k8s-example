@@ -1,62 +1,44 @@
 package global
 
 import (
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"context"
+	"log/slog"
+	"os"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
-var LOG *zap.Logger
+var LOG *slog.Logger
 
 func SetupLogger() {
-	var err error
 	if CFG.Debug {
-		LOG, err = zap.Config{
-			Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
-			Development: true,
-			Encoding:    "console",
-			EncoderConfig: zapcore.EncoderConfig{ // from zap.NewDevelopmentEncoderConfig()
-				TimeKey:        "T",
-				LevelKey:       "L",
-				NameKey:        "N",
-				CallerKey:      "C",
-				FunctionKey:    zapcore.OmitKey,
-				MessageKey:     "M",
-				StacktraceKey:  "S",
-				LineEnding:     zapcore.DefaultLineEnding,
-				EncodeLevel:    zapcore.CapitalColorLevelEncoder,
-				EncodeTime:     zapcore.ISO8601TimeEncoder,
-				EncodeDuration: zapcore.StringDurationEncoder,
-				EncodeCaller:   zapcore.ShortCallerEncoder,
-			},
-			DisableStacktrace: true,
-			OutputPaths:       []string{"stderr"},
-			ErrorOutputPaths:  []string{"stderr"},
-		}.Build()
+		LOG = slog.New(&TraceHandler{
+			slog.NewTextHandler(
+				os.Stderr,
+				&slog.HandlerOptions{AddSource: true, Level: slog.LevelDebug},
+			),
+		})
 	} else {
-		LOG, err = zap.Config{
-			Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
-			Development: false,
-			Encoding:    "json",
-			EncoderConfig: zapcore.EncoderConfig{ // from zap.NewProductionEncoderConfig()
-				TimeKey:        "ts",
-				LevelKey:       "level",
-				NameKey:        "logger",
-				CallerKey:      "caller",
-				FunctionKey:    zapcore.OmitKey,
-				MessageKey:     "msg",
-				StacktraceKey:  "stacktrace",
-				LineEnding:     zapcore.DefaultLineEnding,
-				EncodeLevel:    zapcore.LowercaseLevelEncoder,
-				EncodeTime:     zapcore.EpochTimeEncoder,
-				EncodeDuration: zapcore.MillisDurationEncoder,
-				EncodeCaller:   zapcore.ShortCallerEncoder,
-			},
-			DisableStacktrace: true,
-			OutputPaths:       []string{"stderr"},
-			ErrorOutputPaths:  []string{"stderr"},
-		}.Build()
+		LOG = slog.New(&TraceHandler{
+			slog.NewJSONHandler(
+				os.Stderr,
+				&slog.HandlerOptions{AddSource: true, Level: slog.LevelInfo},
+			),
+		})
 	}
-	if err != nil {
-		panic(err)
+}
+
+type TraceHandler struct {
+	slog.Handler
+}
+
+func (h *TraceHandler) Handle(ctx context.Context, r slog.Record) error {
+	span := trace.SpanFromContext(ctx).SpanContext()
+	if span.IsValid() {
+		r.AddAttrs(
+			slog.String("trace_id", span.TraceID().String()),
+			slog.String("span_id", span.SpanID().String()),
+		)
 	}
+	return h.Handler.Handle(ctx, r)
 }

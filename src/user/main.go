@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,13 +14,12 @@ import (
 	"github.com/whoisnian/k8s-example/src/user/global"
 	"github.com/whoisnian/k8s-example/src/user/model"
 	"github.com/whoisnian/k8s-example/src/user/router"
-	"go.uber.org/zap"
 )
 
 func main() {
 	global.SetupConfig()
 	global.SetupLogger()
-	global.LOG.Info("setup config successfully", zap.Any("CFG", global.CFG))
+	global.LOG.Info("setup config successfully", slog.Any("CFG", global.CFG))
 
 	if global.CFG.Version {
 		fmt.Printf("%s %s(%s)\n", global.AppName, global.Version, global.BuildTime)
@@ -48,11 +48,12 @@ func main() {
 		MaxHeaderBytes:    http.DefaultMaxHeaderBytes,
 	}
 	go func() {
-		global.LOG.Info("service is starting", zap.String("addr", global.CFG.ListenAddr))
+		global.LOG.Info("service is starting", slog.String("addr", global.CFG.ListenAddr))
 		if err := server.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
 			global.LOG.Warn("service is shutting down")
 		} else if err != nil {
-			global.LOG.Fatal(err.Error())
+			global.LOG.Error(err.Error())
+			os.Exit(1)
 		}
 	}()
 

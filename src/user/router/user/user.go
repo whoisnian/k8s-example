@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/url"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/whoisnian/k8s-example/src/user/global"
 	"github.com/whoisnian/k8s-example/src/user/model"
 	"github.com/whoisnian/k8s-example/src/user/pkg/apis"
-	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -29,14 +29,14 @@ func SignUpHandler(c *gin.Context) {
 
 	params := SignUpParams{}
 	if err := c.BindJSON(&params); err != nil {
-		global.LOG.Error("BindJSON SignUpParams", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "BindJSON SignUpParams", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusBadRequest, apis.MsgInvalidParams)
 		return
 	}
 
 	var exists int64
 	if err := global.DB.WithContext(c.Request.Context()).Model(&model.User{}).Where("email = ?", params.Email).Select("1").Find(&exists).Error; err != nil {
-		global.LOG.Error("db find user", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "db find user", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -51,7 +51,7 @@ func SignUpHandler(c *gin.Context) {
 	// BCrypt::Engine.calibrate(220ms) => 12
 	digest, err := bcrypt.GenerateFromPassword([]byte(params.Password), 12)
 	if err != nil {
-		global.LOG.Error("bcrypt generate", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "bcrypt generate", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -62,7 +62,7 @@ func SignUpHandler(c *gin.Context) {
 		Password: string(digest),
 	}
 	if err = global.DB.WithContext(c.Request.Context()).Create(&user).Error; err != nil {
-		global.LOG.Error("db create user", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "db create user", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -78,7 +78,7 @@ type SignInParams struct {
 func SignInHandler(c *gin.Context) {
 	params := SignInParams{}
 	if err := c.BindJSON(&params); err != nil {
-		global.LOG.Error("BindJSON SignInParams", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "BindJSON SignInParams", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusBadRequest, apis.MsgInvalidParams)
 		return
 	}
@@ -89,7 +89,7 @@ func SignInHandler(c *gin.Context) {
 		apis.AbortWithJSONMessage(c, http.StatusForbidden, apis.MsgEmailOrPasswordError)
 		return
 	} else if err != nil {
-		global.LOG.Error("db find user", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "db find user", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -99,7 +99,7 @@ func SignInHandler(c *gin.Context) {
 		apis.AbortWithJSONMessage(c, http.StatusForbidden, apis.MsgEmailOrPasswordError)
 		return
 	} else if err != nil {
-		global.LOG.Error("compare password", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "compare password", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -107,7 +107,7 @@ func SignInHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set("user_id", user.ID)
 	if err = session.Save(); err != nil {
-		global.LOG.Error("save session", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "save session", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -121,16 +121,16 @@ func LogoutHandler(c *gin.Context) {
 		next = "/"
 	} else if u, err := url.Parse(next); err != nil {
 		next = "/"
-		global.LOG.Warn("logout parse next", zap.Error(err))
+		global.LOG.WarnContext(c.Request.Context(), "logout parse next", slog.Any("error", err))
 	} else if u.Scheme != "" || u.Host != "" {
 		next = "/"
-		global.LOG.Warn("logout open-redirect detected", zap.String("nextScheme", u.Scheme), zap.String("nextHost", u.Host))
+		global.LOG.WarnContext(c.Request.Context(), "logout open-redirect detected", slog.String("nextScheme", u.Scheme), slog.String("nextHost", u.Host))
 	}
 
 	session := sessions.Default(c)
 	session.Delete("user_id")
 	if err := session.Save(); err != nil {
-		global.LOG.Error("save session", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "save session", slog.Any("error", err))
 	}
 	apis.Redirect(c, http.StatusTemporaryRedirect, next)
 }
@@ -150,7 +150,7 @@ func InfoHandler(c *gin.Context) {
 		apis.AbortWithJSONMessage(c, http.StatusUnauthorized, apis.MsgInvalidCookie)
 		return
 	} else if err != nil {
-		global.LOG.Error("db find user", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "db find user", slog.Any("error", err))
 		apis.AbortWithJSONMessage(c, http.StatusInternalServerError, apis.MsgInternalError)
 		return
 	}
@@ -173,7 +173,7 @@ func InternalInfoHandler(c *gin.Context) {
 		apis.JSON(c, http.StatusOK, apis.NewInternalResponse[*model.User](apis.CodeInvalidCookie, apis.MsgInvalidCookie, nil))
 		return
 	} else if err != nil {
-		global.LOG.Error("db find user", zap.Error(err))
+		global.LOG.ErrorContext(c.Request.Context(), "db find user", slog.Any("error", err))
 		apis.AbortWithJSON(c, http.StatusInternalServerError, apis.NewInternalResponse[*model.User](apis.CodeInternalError, apis.MsgInternalError, nil))
 		return
 	}
