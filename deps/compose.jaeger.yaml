@@ -9,8 +9,9 @@ services:
       - BADGER_EPHEMERAL=false
       - BADGER_DIRECTORY_KEY=/badger/data/keys
       - BADGER_DIRECTORY_VALUE=/badger/data/values
+      - COLLECTOR_OTLP_GRPC_HOST_PORT=0.0.0.0:4317 # https://github.com/jaegertracing/jaeger/issues/5737
+      - COLLECTOR_OTLP_HTTP_HOST_PORT=0.0.0.0:4318 # https://github.com/jaegertracing/jaeger/issues/5737
     ports: # https://www.jaegertracing.io/docs/1.59/deployment/
-      - 14269:14269 # health check and metrics
       - 16686:16686 # serve frontend
       - 4317:4317 # OTLP over gRPC
       - 4318:4318 # OTLP over HTTP
