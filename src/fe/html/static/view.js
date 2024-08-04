@@ -51,7 +51,7 @@ uploadFormButton.onclick = (e) => {
   e.preventDefault()
 
   // https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#multipart-form-data
-	// The order of parts must be the same as the order of fields in entry list.
+  // The order of parts must be the same as the order of fields in entry list.
   const formData = new FormData()
   const sizes = []
   for (const f of fileListInput.files) sizes.push(f.size)
@@ -104,6 +104,23 @@ signupFormButton.onclick = async (e) => {
   if (ok) reloadPage()
 }
 
+const snippetSaveButton = document.getElementById('snippetSaveButton')
+snippetSaveButton.onclick = async (e) => {
+  e.preventDefault()
+  const formData = new FormData(document.getElementById('snippetForm'))
+  const { ok } = await fetchPostJSONWithStatus('/user/snippet', Object.fromEntries(formData.entries()))
+  if (ok) reloadPage()
+}
+
+const snippetText = document.getElementById('snippetText')
+const expirationSelect = document.getElementById('expirationSelect')
+const snippetDeleteButton = document.getElementById('snippetDeleteButton')
+snippetDeleteButton.onclick = async () => {
+  await fetchDeleteHead(`/user/snippet`)
+  snippetText.value = ""
+  expirationSelect.title = ""
+}
+
 const { ok, content: userInfo } = await fetchGetJSONWithStatus('/user/info')
 if (ok) {
   usernameSpan.textContent = userInfo.name
@@ -114,3 +131,7 @@ if (ok) {
 const infoTable = document.getElementById('infoTable')
 const fileinfos = await fetchGetJSON('/file/objects')
 fileinfos.forEach(info => infoTable.appendChild(createFileItem(info)))
+
+const snippet = await fetchGetJSON('/user/snippet')
+snippetText.value = snippet.content
+if (snippet.expiration > 0) expirationSelect.title = new Date(Date.now() + snippet.expiration * 1000).toLocaleString()

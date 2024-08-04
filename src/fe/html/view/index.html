@@ -41,6 +41,11 @@
       background-color: #b1b1b9;
     }
 
+    select {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
     dialog {
       border-radius: 8px;
       border-width: 2px;
@@ -66,6 +71,25 @@
   <br />
 
   <table id="infoTable" style="width:100%;"></table>
+  <br />
+  <hr /><br />
+
+  <form id="snippetForm">
+    <div>Snippet:</div>
+    <textarea id="snippetText" form="snippetForm" name="content" rows="5" maxlength="4194304" autocomplete="off"
+      style="box-sizing:border-box;width:100%;margin:8px 0;word-break:break-all;"></textarea>
+    <div style="display:flex;justify-content:right;column-gap:1em;">
+      <select id="expirationSelect" form="snippetForm" name="expiration" autocomplete="off">
+        <option value="60">1 min</option>
+        <option value="300" selected="selected">5 min</option>
+        <option value="1800">30 min</option>
+        <option value="86400">24 hour</option>
+        <option value="0">unlimit</option>
+      </select>
+      <button id="snippetSaveButton" type="submit">SAVE</button>
+      <button id="snippetDeleteButton" type="button">DEL</button>
+    </div>
+  </form>
   <br />
 
   <dialog id="signinDialog">
