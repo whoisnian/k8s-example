@@ -21,6 +21,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build/,id=build-$TARGETARCH \
     --mount=type=cache,target=/go/pkg/mod/ \
     CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
     go build -trimpath -ldflags="-s -w \
+    -X '${MODULE_NAME}/global.ModName=${MODULE_NAME}' \
     -X '${MODULE_NAME}/global.AppName=${APP_NAME}' \
     -X '${MODULE_NAME}/global.Version=${VERSION}' \
     -X '${MODULE_NAME}/global.BuildTime=${BUILDTIME}'" \

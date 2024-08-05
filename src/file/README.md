@@ -40,3 +40,24 @@ export CFG_S3SECURE=false
 ./build/build.sh . && CFG_AUTOMIGRATE=true ./output/k8s-example-file
 ./build/build.sh . && ./output/k8s-example-file
 ```
+
+## build
+```sh
+# pwd: src/file
+MODULE_NAME=$(go mod edit -fmt -print | grep -Po '(?<=^module ).*$')
+APP_NAME="k8s-example-file"
+BUILDTIME=$(date --iso-8601=seconds)
+VERSION=$(git describe --tags 2> /dev/null || echo unknown)
+
+DOCKER_BUILDKIT=1 docker build \
+  --file ./build/Dockerfile \
+  --progress=plain \
+  --platform=linux/amd64 \
+  --build-arg MODULE_NAME="$MODULE_NAME" \
+  --build-arg APP_NAME="$APP_NAME" \
+  --build-arg VERSION="$VERSION" \
+  --build-arg BUILDTIME="$BUILDTIME" \
+  --tag ghcr.io/whoisnian/k8s-example-file:$VERSION \
+  .
+docker push ghcr.io/whoisnian/k8s-example-file:$VERSION
+```
