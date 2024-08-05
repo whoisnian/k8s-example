@@ -134,4 +134,5 @@ fileinfos.forEach(info => infoTable.appendChild(createFileItem(info)))
 
 const snippet = await fetchGetJSON('/user/snippet')
 snippetText.value = snippet.content
+snippetText.style.height = `${snippetText.scrollHeight + 20}px` // reserved 20px for possible horizontal scrollbar
 if (snippet.expiration > 0) expirationSelect.title = new Date(Date.now() + snippet.expiration * 1000).toLocaleString()
