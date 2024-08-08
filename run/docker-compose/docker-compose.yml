@@ -1,0 +1,33 @@
+services:
+  nginx-gateway:
+    image: docker.io/library/nginx:1.27-alpine
+    restart: always
+    ports:
+      - "8090:80"
+    volumes:
+      - ./nginx.gateway.conf:/etc/nginx/nginx.conf:ro
+
+  svc-fe:
+    image: ghcr.io/whoisnian/k8s-example-fe-nginx:v2.0.0-next.1
+    restart: always
+
+  svc-user:
+    image: ghcr.io/whoisnian/k8s-example-user:v2.0.0-next.1
+    restart: always
+    environment:
+      - CFG_MYSQLDSN=root:ChFHZ8Jjo9u6F3RxKbiO@tcp(172.17.0.1:3306)/demodb?charset=utf8mb4&parseTime=True&loc=UTC
+      - CFG_REDISURI=redis://default:R5NjwH9uKh8vuZY1R2fd@172.17.0.1:6379/0
+      - CFG_TRACEENDPOINTURL=http://172.17.0.1:4318
+
+  svc-file:
+    image: ghcr.io/whoisnian/k8s-example-file:v2.0.0-next.1
+    restart: always
+    environment:
+      - CFG_MYSQLDSN=root:ChFHZ8Jjo9u6F3RxKbiO@tcp(172.17.0.1:3306)/demodb?charset=utf8mb4&parseTime=True&loc=UTC
+      - CFG_STORAGEDRIVER=aws-s3
+      - CFG_S3ENDPOINT=172.17.0.1:9000
+      - CFG_S3ACCESSKEY=DNtNHG02un
+      - CFG_S3SECRETKEY=LGoucBTxlsXwhmJ9Q8aS
+      - CFG_S3SECURE=false
+      - CFG_EXTERNALSVCUSER=http://svc-user:8080
+      - CFG_TRACEENDPOINTURL=http://172.17.0.1:4318
