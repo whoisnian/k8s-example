@@ -31,11 +31,13 @@ persistent file storage
 ```sh
 # pwd: src/file
 export CFG_MYSQLDSN="root:ChFHZ8Jjo9u6F3RxKbiO@tcp(127.0.0.1:3306)/demodb?charset=utf8mb4&parseTime=True&loc=UTC"
-export CFG_STORAGEDRIVER=aws-s3
-export CFG_S3ENDPOINT=127.0.0.1:9000
-export CFG_S3ACCESSKEY=DNtNHG02un
-export CFG_S3SECRETKEY=LGoucBTxlsXwhmJ9Q8aS
+export CFG_STORAGEDRIVER="aws-s3"
+export CFG_S3ENDPOINT="127.0.0.1:9000"
+export CFG_S3ACCESSKEY="DNtNHG02un"
+export CFG_S3SECRETKEY="LGoucBTxlsXwhmJ9Q8aS"
 export CFG_S3SECURE=false
+export CFG_EXTERNALSVCUSER="http://127.0.0.1:8080"
+export CFG_TRACEENDPOINTURL="http://127.0.0.1:4318"
 
 ./build/build.sh . && CFG_AUTOMIGRATE=true ./output/k8s-example-file
 ./build/build.sh . && ./output/k8s-example-file
@@ -57,7 +59,11 @@ DOCKER_BUILDKIT=1 docker build \
   --build-arg APP_NAME="$APP_NAME" \
   --build-arg VERSION="$VERSION" \
   --build-arg BUILDTIME="$BUILDTIME" \
-  --tag ghcr.io/whoisnian/k8s-example-file:$VERSION \
+  --label org.opencontainers.image.source=https://github.com/whoisnian/k8s-example \
+  --label org.opencontainers.image.url=https://github.com/whoisnian/k8s-example \
+  --label org.opencontainers.image.title="$APP_NAME" \
+  --label org.opencontainers.image.version="$VERSION" \
+  --tag "ghcr.io/whoisnian/$APP_NAME:$VERSION" \
   .
-docker push ghcr.io/whoisnian/k8s-example-file:$VERSION
+docker push "ghcr.io/whoisnian/$APP_NAME:$VERSION"
 ```
