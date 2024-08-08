@@ -1,4 +1,4 @@
-FROM nginx:1.27-alpine
+FROM docker.io/library/nginx:1.27-alpine
 
 COPY html /app/html
 COPY nginx/nginx.prod.conf /app/nginx.conf
