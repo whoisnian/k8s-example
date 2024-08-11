@@ -4,6 +4,8 @@ services:
   nginx-gateway:
     image: docker.io/library/nginx:1.27-alpine
     restart: always
+    environment:
+      - NGINX_ENTRYPOINT_QUIET_LOGS=1
     ports:
       - "8090:80"
     volumes:
