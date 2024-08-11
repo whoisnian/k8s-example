@@ -1,17 +1,17 @@
 services:
   jaeger:
-    image: jaegertracing/all-in-one:1.59
+    image: jaegertracing/all-in-one:1.60
     restart: always
     volumes:
       - jaeger_data:/badger
+    tmpfs:
+      - /tmp
     environment:
       - SPAN_STORAGE_TYPE=badger
       - BADGER_EPHEMERAL=false
       - BADGER_DIRECTORY_KEY=/badger/data/keys
       - BADGER_DIRECTORY_VALUE=/badger/data/values
-      - COLLECTOR_OTLP_GRPC_HOST_PORT=0.0.0.0:4317 # https://github.com/jaegertracing/jaeger/issues/5737
-      - COLLECTOR_OTLP_HTTP_HOST_PORT=0.0.0.0:4318 # https://github.com/jaegertracing/jaeger/issues/5737
-    ports: # https://www.jaegertracing.io/docs/1.59/deployment/
+    ports: # https://www.jaegertracing.io/docs/1.60/deployment/
       - 16686:16686 # serve frontend
       - 4317:4317 # OTLP over gRPC
       - 4318:4318 # OTLP over HTTP
@@ -19,21 +19,23 @@ services:
       test:
         [
           "CMD-SHELL",
-          "/go/bin/all-in-one-linux status", # https://github.com/jaegertracing/jaeger/blob/8c9f6c6df758d647f1cdb8b123b34a5743eaf87d/cmd/internal/status/command.go
+          "/go/bin/all-in-one-linux status", # https://github.com/jaegertracing/jaeger/blob/0524ae6df8acac17e8ed52af9b86e6dee85a5e5e/cmd/internal/status/command.go
         ]
       interval: 5s
       timeout: 5s
       retries: 10
     depends_on:
-      prepare-jaeger:
+      pre-jaeger:
         condition: service_completed_successfully
 
-  prepare-jaeger: # https://github.com/jaegertracing/jaeger/blob/8c9f6c6df758d647f1cdb8b123b34a5743eaf87d/plugin/storage/badger/docs/storage-file-non-root-permission.md
-    image: jaegertracing/all-in-one:1.59
+  pre-jaeger: # https://github.com/jaegertracing/jaeger/blob/0524ae6df8acac17e8ed52af9b86e6dee85a5e5e/plugin/storage/badger/docs/storage-file-non-root-permission.md
+    image: jaegertracing/all-in-one:1.60
     user: root
     entrypoint: sh -c "test -d /badger/data || install -o 10001 -g 10001 -m 0700 -d /badger/data"
     volumes:
       - jaeger_data:/badger
+    tmpfs:
+      - /tmp
 
 volumes:
   jaeger_data:
