@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,7 +19,7 @@ import (
 func main() {
 	global.SetupConfig()
 	global.SetupLogger()
-	global.LOG.Info("setup config successfully", slog.Any("CFG", global.CFG))
+	global.LOG.Info(fmt.Sprintf("setup config successfully: %+v", global.CFG))
 
 	if global.CFG.Version {
 		fmt.Printf("%s %s(%s)\n", global.AppName, global.Version, global.BuildTime)
@@ -52,7 +51,7 @@ func main() {
 		MaxHeaderBytes:    http.DefaultMaxHeaderBytes,
 	}
 	go func() {
-		global.LOG.Info("service is starting", slog.String("addr", global.CFG.ListenAddr))
+		global.LOG.Info("service is starting: " + global.CFG.ListenAddr)
 		if err := server.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
 			global.LOG.Warn("service is shutting down")
 		} else if err != nil {
