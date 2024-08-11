@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     restart: always
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
@@ -23,39 +23,33 @@ services:
       timeout: 10s
       retries: 120
 
-  prepare-kibana: # https://github.com/elastic/elasticsearch/blob/d55f984299e0e88dee72ebd8255f7ff130859ad0/docs/reference/setup/install/docker/docker-compose.yml
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
-    user: root
+  post-elasticsearch: # https://github.com/elastic/elasticsearch/blob/d55f984299e0e88dee72ebd8255f7ff130859ad0/docs/reference/setup/install/docker/docker-compose.yml
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     volumes:
-      - kibana_data:/usr/share/kibana/data
+      - elasticsearch_data:/usr/share/elasticsearch/data
     command: >
-      bash -c '
-        if [ -f /usr/share/kibana/data/.kibana-initialized ]; then
-          echo "Skip kibana_system password initialization"
-          exit 0
-        else
-          touch /usr/share/kibana/data/.kibana-initialized
-        fi
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Missing the ELASTIC_PASSWORD environment variable"
-          exit 1
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Missing the KIBANA_PASSWORD environment variable"
-          exit 1
-        fi
-        until curl -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done
+      bash -e -x -c '
+        test -f /usr/share/elasticsearch/data/.initialized && exit 0
+        touch /usr/share/elasticsearch/data/.initialized
+        curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}"
+        curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/role/fluentbit -d "{\"cluster\":[\"monitor\"],\"indices\":[{\"names\":[\"flb.*\"],\"privileges\":[\"create\",\"write\",\"delete\",\"create_index\"]}]}"
+        curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/fluentbit -d "{\"roles\":[\"fluentbit\"],\"password\":\"${FLUENTBIT_PASSWORD}\"}"
+        curl --fail -s -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_ilm/policy/flb.logs-14days -d "{\"policy\":{\"phases\":{\"hot\":{\"min_age\":\"0ms\",\"actions\":{\"set_priority\":{\"priority\":100}}},\"warm\":{\"min_age\":\"2d\",\"actions\":{\"readonly\":{},\"set_priority\":{\"priority\":50}}},\"delete\":{\"min_age\":\"14d\",\"actions\":{\"delete\":{\"delete_searchable_snapshot\":true}}}}}}"
+        curl --fail -s -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_index_template/flb.logs -d "{\"index_patterns\":[\"flb.*\"],\"template\":{\"settings\":{\"index\":{\"lifecycle\":{\"name\":\"flb.logs-14days\"},\"number_of_replicas\":0}}}}"
       '
     depends_on:
       elasticsearch:
         condition: service_healthy
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.14.3
+    image: docker.elastic.co/kibana/kibana:8.15.0
     restart: always
     volumes:
       - kibana_data:/usr/share/kibana/data
     environment:
       - SERVERNAME=kibana
+      - TELEMETRY_OPTIN=false
+      - TELEMETRY_ALLOWCHANGINGOPTINSTATUS=false
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
@@ -71,7 +65,7 @@ services:
       timeout: 10s
       retries: 120
     depends_on:
-      prepare-kibana:
+      post-elasticsearch:
         condition: service_completed_successfully
 
 volumes:
