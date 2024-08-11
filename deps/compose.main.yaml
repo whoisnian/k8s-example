@@ -1,4 +1,4 @@
-name: k8s-example
+name: k8s-example-deps
 
 include:
   - path: compose.minio.yaml

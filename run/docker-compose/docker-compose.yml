@@ -1,3 +1,5 @@
+name: k8s-example-run
+
 services:
   nginx-gateway:
     image: docker.io/library/nginx:1.27-alpine
@@ -6,10 +8,26 @@ services:
       - "8090:80"
     volumes:
       - ./nginx.gateway.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - fluent-bit
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
+        tag: flb.nginx-gateway
+        fluentd-async: "true"
 
   svc-fe:
     image: ghcr.io/whoisnian/k8s-example-fe-nginx:v2.0.0-next.1
     restart: always
+    depends_on:
+      - fluent-bit
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
+        tag: flb.svc-fe
+        fluentd-async: "true"
 
   svc-user:
     image: ghcr.io/whoisnian/k8s-example-user:v2.0.0-next.1
@@ -18,6 +36,14 @@ services:
       - CFG_MYSQLDSN=root:ChFHZ8Jjo9u6F3RxKbiO@tcp(172.17.0.1:3306)/demodb?charset=utf8mb4&parseTime=True&loc=UTC
       - CFG_REDISURI=redis://default:R5NjwH9uKh8vuZY1R2fd@172.17.0.1:6379/0
       - CFG_TRACEENDPOINTURL=http://172.17.0.1:4318
+    depends_on:
+      - fluent-bit
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
+        tag: flb.svc-user
+        fluentd-async: "true"
 
   svc-file:
     image: ghcr.io/whoisnian/k8s-example-file:v2.0.0-next.1
@@ -31,3 +57,20 @@ services:
       - CFG_S3SECURE=false
       - CFG_EXTERNALSVCUSER=http://svc-user:8080
       - CFG_TRACEENDPOINTURL=http://172.17.0.1:4318
+    depends_on:
+      - fluent-bit
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
+        tag: flb.svc-file
+        fluentd-async: "true"
+
+  fluent-bit:
+    image: docker.io/fluent/fluent-bit:3.1.5
+    restart: always
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./flb.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      - ./flb.parsers.conf:/fluent-bit/etc/parsers.conf:ro
