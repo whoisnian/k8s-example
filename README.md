@@ -47,3 +47,51 @@
   kubectl create namespace k8s-example
   kubectl apply -k ./overlays/dev
   ```
+
+https://www.elastic.co/guide/en/observability/current/apm-getting-started-apm-server.html
+apm-server 依赖 fleet 的 APM integration 配置 index templates/ILM policies/ingest pipelines  
+apm-server 只负责发送数据到 es
+
+https://www.elastic.co/guide/en/fleet/8.15/fleet-server.html
+Fleet Server is a subprocess that runs inside a deployed Elastic Agent. This means the deployment steps are similar to any Elastic Agent, except that you enroll the agent in a special Fleet Server policy. Typically—​especially in large-scale deployments—​this agent is dedicated to running Fleet Server as an Elastic Agent communication host and is not configured for data collection.
+
+https://discuss.elastic.co/t/apm-server-installation-without-fleet-server-in-single-node/330600
+https://github.com/elastic/apm-server/issues/10361#issue-1600406694
+https://discuss.elastic.co/t/how-to-install-apm-server-in-legacy-mode-without-elastic-apm-integration/325724
+https://www.elastic.co/guide/en/observability/current/apm-running-on-docker.html#_configure_apm_server_on_docker
+https://www.elastic.co/guide/en/observability/current/apm-privileges-to-publish-events.html
+
+```yaml
+elastic-agent:
+  image: docker.elastic.co/beats/elastic-agent:8.15.0
+  restart: always
+  environment:
+    - KIBANA_FLEET_SETUP=1
+    - KIBANA_FLEET_HOST=http://kibana:5601
+    - KIBANA_FLEET_USERNAME=elastic
+    - KIBANA_FLEET_PASSWORD=ClkmQKTesKG4ozWYf9G6
+    - FLEET_SERVER_ENABLE=1
+    - FLEET_SERVER_ELASTICSEARCH_HOST=http://elasticsearch:9200
+    - FLEET_SERVER_POLICY_ID=fleet-server-policy
+  ports:
+    - 8220:8220
+  depends_on:
+    kibana:
+      condition: service_healthy
+
+# ./kibana.yml:/usr/share/kibana/config/kibana.yml
+xpack.fleet.packages:
+  - name: fleet_server
+    version: latest
+  - name: apm
+    version: latest
+xpack.fleet.agentPolicies:
+  - name: fleet-server-policy
+    id: fleet-server-policy
+    namespace: default
+    monitoring_enabled: []
+    package_policies:
+      - name: fleet_server-1
+        package:
+          name: fleet_server
+```

@@ -1,0 +1,285 @@
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_ingest/pipeline" | jq 'keys'
+[
+  ".fleet_final_pipeline-1",
+  ".kibana-observability-ai-assistant-kb-ingest-pipeline",
+  ".slo-observability.sli.pipeline-v3.3",
+  "apm@pipeline",
+  "behavioral_analytics-events-final_pipeline",
+  "ent-search-generic-ingestion",
+  "logs-apm.app@default-pipeline",
+  "logs-apm.error@default-pipeline",
+  "logs-default-pipeline",
+  "logs-fleet_server.output_health-1.5.0",
+  "logs@default-pipeline",
+  "logs@json-message",
+  "logs@json-pipeline",
+  "metrics-apm.app@default-pipeline",
+  "metrics-apm.internal@default-pipeline",
+  "metrics-apm.service_destination@default-pipeline",
+  "metrics-apm.service_summary@default-pipeline",
+  "metrics-apm.service_transaction@default-pipeline",
+  "metrics-apm.transaction@default-pipeline",
+  "metrics-apm@pipeline",
+  "metrics-fleet_server.agent_status-1.5.0",
+  "metrics-fleet_server.agent_versions-1.5.0",
+  "search-default-ingestion",
+  "synthetics-browser-1.2.2",
+  "synthetics-browser.network-1.2.2",
+  "synthetics-browser.screenshot-1.2.2",
+  "synthetics-http-1.2.2",
+  "synthetics-icmp-1.2.2",
+  "synthetics-tcp-1.2.2",
+  "traces-apm.rum@default-pipeline",
+  "traces-apm@default-pipeline",
+  "traces-apm@pipeline"
+]
+
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_ilm/policy" | jq 'keys'
+[
+  ".alerts-ilm-policy",
+  ".deprecation-indexing-ilm-policy",
+  ".fleet-actions-results-ilm-policy",
+  ".fleet-file-fromhost-data-ilm-policy",
+  ".fleet-file-fromhost-meta-ilm-policy",
+  ".fleet-file-tohost-data-ilm-policy",
+  ".fleet-file-tohost-meta-ilm-policy",
+  ".monitoring-8-ilm-policy",
+  ".preview.alerts-security.alerts-policy",
+  "180-days-default",
+  "180-days@lifecycle",
+  "30-days-default",
+  "30-days@lifecycle",
+  "365-days-default",
+  "365-days@lifecycle",
+  "7-days-default",
+  "7-days@lifecycle",
+  "90-days-default",
+  "90-days@lifecycle",
+  "flb.logs-14days",
+  "ilm-history-ilm-policy",
+  "kibana-reporting",
+  "logs",
+  "logs-fleet_server.output_health_logs-default_policy",
+  "logs@lifecycle",
+  "metrics",
+  "metrics@lifecycle",
+  "ml-size-based-ilm-policy",
+  "slm-history-ilm-policy",
+  "synthetics",
+  "synthetics-synthetics.browser-default_policy",
+  "synthetics-synthetics.browser_network-default_policy",
+  "synthetics-synthetics.browser_screenshot-default_policy",
+  "synthetics-synthetics.http-default_policy",
+  "synthetics-synthetics.icmp-default_policy",
+  "synthetics-synthetics.tcp-default_policy",
+  "synthetics@lifecycle",
+  "watch-history-ilm-policy-16"
+]
+
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_stats" | jq '.indices | keys'
+[
+  ".ds-metrics-apm.internal-default-2024.08.18-000001",
+  ".ds-metrics-apm.service_summary.1m-default-2024.08.18-000001",
+  ".ds-metrics-apm.service_transaction.1m-default-2024.08.18-000001",
+  ".ds-metrics-apm.transaction.1m-default-2024.08.18-000001",
+  ".ds-metrics-fleet_server.agent_status-default-2024.08.18-000001",
+  ".ds-metrics-fleet_server.agent_versions-default-2024.08.18-000001",
+  ".ds-traces-apm-default-2024.08.18-000001",
+  ".internal.alerts-default.alerts-default-000001",
+  ".internal.alerts-ml.anomaly-detection-health.alerts-default-000001",
+  ".internal.alerts-ml.anomaly-detection.alerts-default-000001",
+  ".internal.alerts-observability.apm.alerts-default-000001",
+  ".internal.alerts-observability.logs.alerts-default-000001",
+  ".internal.alerts-observability.metrics.alerts-default-000001",
+  ".internal.alerts-observability.slo.alerts-default-000001",
+  ".internal.alerts-observability.threshold.alerts-default-000001",
+  ".internal.alerts-observability.uptime.alerts-default-000001",
+  ".internal.alerts-security.alerts-default-000001",
+  ".internal.alerts-stack.alerts-default-000001",
+  ".internal.alerts-transform.health.alerts-default-000001",
+  ".kibana-observability-ai-assistant-conversations-000001",
+  ".kibana-observability-ai-assistant-kb-000001"
+]
+
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_data_stream?expand_wildcards=all" | jq '.data_streams[] | .name'
+".kibana-event-log-ds"
+".logs-deprecation.elasticsearch-default"
+"ilm-history-7"
+"metrics-apm.internal-default"
+"metrics-apm.service_summary.10m-default"
+"metrics-apm.service_summary.1m-default"
+"metrics-apm.service_summary.60m-default"
+"metrics-apm.service_transaction.10m-default"
+"metrics-apm.service_transaction.1m-default"
+"metrics-apm.service_transaction.60m-default"
+"metrics-apm.transaction.10m-default"
+"metrics-apm.transaction.1m-default"
+"metrics-apm.transaction.60m-default"
+"metrics-fleet_server.agent_status-default"
+"metrics-fleet_server.agent_versions-default"
+"traces-apm-default"
+
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_index_template" | jq '.index_templates[] | .name'
+".kibana-reporting"
+"synthetics-browser.screenshot"
+".monitoring-ent-search-mb"
+"logs-apm.error@template"
+".kibana-observability-ai-assistant-index-template-kb"
+"metrics-apm.service_destination.1m@template"
+"metrics-apm.service_summary.60m@template"
+"metrics-apm.service_summary.1m@template"
+"ilm-history-7"
+".fleet-fileds-tohost-meta"
+"metrics-apm.transaction.1m@template"
+".kibana-event-log-template"
+".fleet-fileds-fromhost-data"
+"metrics-apm.service_transaction.60m@template"
+".alerts-observability.metrics.alerts-default-index-template"
+".kibana-elastic-ai-assistant-index-template-conversations"
+"synthetics-browser"
+".slo-observability.summary"
+"metrics-apm.transaction.60m@template"
+"logs"
+".watch-history-16"
+".monitoring-beats-mb"
+"metrics-apm.transaction.10m@template"
+".alerts-ml.anomaly-detection.alerts-default-index-template"
+".monitoring-kibana-mb"
+"metrics-apm.service_summary.10m@template"
+".kibana-data-quality-dashboard-results-index-template"
+".ml-state"
+".monitoring-logstash-mb"
+".alerts-stack.alerts-default-index-template"
+".ml-anomalies-"
+"metrics"
+".ml-notifications-000002"
+"metrics-apm.service_destination.10m@template"
+".ml-stats"
+".slm-history-7"
+".alerts-security.alerts-default-index-template"
+"synthetics-icmp"
+".alerts-observability.slo.alerts-default-index-template"
+"behavioral_analytics-events-default"
+"synthetics-http"
+".fleet-fileds-fromhost-meta"
+"elastic-connectors"
+".kibana-elastic-ai-assistant-index-template-knowledge-base"
+"metrics-apm.service_destination.60m@template"
+".alerts-default.alerts-default-index-template"
+"synthetics-tcp"
+"flb.logs"
+"elastic-connectors-sync-jobs"
+".monitoring-es-mb"
+"metrics-fleet_server.agent_status"
+".alerts-ml.anomaly-detection-health.alerts-default-index-template"
+".slo-observability.sli"
+".alerts-observability.logs.alerts-default-index-template"
+"apm-source-map"
+"metrics-fleet_server.agent_versions"
+"metrics-apm.service_transaction.10m@template"
+"traces-apm@template"
+"logs-apm.app@template"
+"metrics-apm.service_transaction.1m@template"
+"synthetics"
+"metrics-apm.internal@template"
+".alerts-observability.uptime.alerts-default-index-template"
+".kibana-observability-ai-assistant-index-template-conversations"
+"synthetics-browser.network"
+".alerts-observability.threshold.alerts-default-index-template"
+".alerts-transform.health.alerts-default-index-template"
+".fleet-fileds-tohost-data"
+"traces-apm.rum@template"
+"entities_v1_index_template"
+"search-acl-filter"
+".deprecation-indexing-template"
+"logs-fleet_server.output_health"
+"metrics-apm.app@template"
+".alerts-observability.apm.alerts-default-index-template"
+"traces-apm.sampled@template"
+
+curl -s -X GET -u "elastic:ClkmQKTesKG4ozWYf9G6" "http://127.0.0.1:9200/_component_template" | jq '.component_templates[] | .name'
+".fleet_agent_id_verification-1"
+"elastic-connectors-mappings"
+"synthetics@mappings"
+"synthetics-mappings"
+"metrics-apm.service_destination@mappings"
+"ecs@mappings"
+"apm-10d@lifecycle"
+".slo-observability.summary-mappings"
+".alerts-transform.health.alerts-mappings"
+".preview.alerts-security.alerts-mappings"
+"kibana-reporting@settings"
+"entities_v1_entity"
+".slo-observability.sli-mappings"
+".deprecation-indexing-settings"
+"metrics-apm.transaction@mappings"
+".kibana-elastic-ai-assistant-component-template-knowledge-base"
+"logs-fleet_server.output_health@package"
+"metrics@tsdb-settings"
+".kibana-elastic-ai-assistant-component-template-conversations"
+"apm@mappings"
+".alerts-stack.alerts-mappings"
+"apm-90d@lifecycle"
+"metrics-apm@mappings"
+".alerts-technical-mappings"
+"elastic-connectors-sync-jobs-mappings"
+"behavioral_analytics-events-mappings"
+"metrics-fleet_server.agent_status@package"
+".kibana-data-quality-dashboard-results-mappings"
+".alerts-observability.logs.alerts-mappings"
+"synthetics-settings"
+"logs-mappings"
+".deprecation-indexing-mappings"
+".alerts-observability.metrics.alerts-mappings"
+".alerts-observability.slo.alerts-mappings"
+"synthetics-icmp@package"
+"metrics-apm@settings"
+"metrics-settings"
+"entities_v1_event"
+".alerts-ml.anomaly-detection-health.alerts-mappings"
+".alerts-legacy-alert-mappings"
+"metrics-mappings"
+"metrics@mappings"
+".kibana-observability-ai-assistant-component-template-conversations"
+"metrics-fleet_server.agent_versions@package"
+"apm@settings"
+".alerts-ecs-mappings"
+".alerts-observability.uptime.alerts-mappings"
+".alerts-observability.apm.alerts-mappings"
+"ecs@dynamic_templates"
+"apm-180d@lifecycle"
+".fleet_globals-1"
+".kibana-data-quality-dashboard-ecs-mappings"
+".alerts-observability.threshold.alerts-mappings"
+"kibana-reporting@custom"
+"apm-390d@lifecycle"
+"traces-apm.rum@mappings"
+"synthetics-browser@package"
+"elastic-connectors-settings"
+"behavioral_analytics-events-settings"
+"synthetics@settings"
+".slo-observability.sli-settings"
+"logs@mappings"
+"logs-settings"
+".slo-observability.summary-settings"
+"metrics-tsdb-settings"
+"metrics-apm.service_summary@mappings"
+"entities_v1_base"
+"data-streams-mappings"
+"data-streams@mappings"
+"traces@mappings"
+"metrics-apm.service_transaction@mappings"
+"traces-apm@mappings"
+"synthetics-tcp@package"
+".alerts-security.alerts-mappings"
+"synthetics-browser.network@package"
+".alerts-ml.anomaly-detection.alerts-mappings"
+"metrics@settings"
+"elastic-connectors-sync-jobs-settings"
+"logs-apm.error@mappings"
+"logs-apm@settings"
+".alerts-framework-mappings"
+".kibana-observability-ai-assistant-component-template-kb"
+"logs@settings"
+"synthetics-browser.screenshot@package"
+"synthetics-http@package"
