@@ -36,6 +36,8 @@ services:
         curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/fluentbit -d "{\"roles\":[\"fluentbit\"],\"password\":\"${FLUENTBIT_PASSWORD}\"}"
         curl --fail -s -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_ilm/policy/flb.logs-14days -d "{\"policy\":{\"phases\":{\"hot\":{\"min_age\":\"0ms\",\"actions\":{\"set_priority\":{\"priority\":100}}},\"warm\":{\"min_age\":\"2d\",\"actions\":{\"readonly\":{},\"set_priority\":{\"priority\":50}}},\"delete\":{\"min_age\":\"14d\",\"actions\":{\"delete\":{\"delete_searchable_snapshot\":true}}}}}}"
         curl --fail -s -X PUT -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_index_template/flb.logs -d "{\"index_patterns\":[\"flb.*\"],\"template\":{\"settings\":{\"index\":{\"lifecycle\":{\"name\":\"flb.logs-14days\"},\"number_of_replicas\":0}}}}"
+        curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/role/apm_writer -d "{\"cluster\":[\"monitor\"],\"indices\":[{\"names\":[\"apm-*\",\"traces-apm*\",\"logs-apm*\",\"metrics-apm*\"],\"privileges\":[\"auto_configure\",\"create_index\",\"create_doc\"]}]}"
+        curl --fail -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" http://elasticsearch:9200/_security/user/apm_writer -d "{\"roles\":[\"apm_writer\"],\"password\":\"${APM_WRITER_PASSWORD}\"}"
       '
     depends_on:
       elasticsearch:
@@ -53,6 +55,7 @@ services:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - xpack.fleet.packages=[{"name":"apm","version":"latest"}]
     ports:
       - 5601:5601
     healthcheck:
@@ -64,6 +67,31 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    depends_on:
+      post-elasticsearch:
+        condition: service_completed_successfully
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.15.0
+    restart: always
+    command:
+      - -e
+      - -E=max_procs=4
+      - -E=apm-server.auth.secret_token=${APM_SECRET_TOKEN}
+      - -E=output.elasticsearch.hosts=["http://elasticsearch:9200"]
+      - -E=output.elasticsearch.username=apm_writer
+      - -E=output.elasticsearch.password=${APM_WRITER_PASSWORD}
+    ports:
+      - 8200:8200
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD-SHELL",
+    #       'curl -s -H "Authorization: Bearer ${APM_SECRET_TOKEN}" http://localhost:8200 | grep -q ''publish_ready": true''',
+    #     ]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 10
     depends_on:
       post-elasticsearch:
         condition: service_completed_successfully
